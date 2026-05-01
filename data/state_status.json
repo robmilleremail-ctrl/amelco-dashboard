@@ -1,0 +1,519 @@
+{
+  "_meta": {
+    "last_updated": "2026-04-21",
+    "source": "Legal Sports Report, AGA, CBS Sports state trackers",
+    "notes": "Baseline as of April 21, 2026. Update manually when status changes confirmed."
+  },
+  "states": {
+    "AL": {
+      "name": "Alabama",
+      "osb": "Not legal",
+      "igaming": "Not legal",
+      "prediction_markets": "No state action",
+      "horse_racing_online": "Not legal",
+      "tax_rate_osb": null,
+      "tax_rate_igaming": null,
+      "notes": ""
+    },
+    "AK": {
+      "name": "Alaska",
+      "osb": "Not legal",
+      "igaming": "Not legal",
+      "prediction_markets": "No state action",
+      "horse_racing_online": "Not legal",
+      "tax_rate_osb": null,
+      "tax_rate_igaming": null,
+      "notes": ""
+    },
+    "AZ": {
+      "name": "Arizona",
+      "osb": "Live",
+      "igaming": "Not legal",
+      "prediction_markets": "Permitted",
+      "horse_racing_online": "Live",
+      "tax_rate_osb": 0.08,
+      "tax_rate_igaming": null,
+      "notes": "Tribal and commercial licenses. 18 sportsbook licenses."
+    },
+    "AR": {
+      "name": "Arkansas",
+      "osb": "Live",
+      "igaming": "Not legal",
+      "prediction_markets": "No state action",
+      "horse_racing_online": "Live",
+      "tax_rate_osb": 0.13,
+      "tax_rate_igaming": null,
+      "notes": "Casinos and Southland operate sportsbooks."
+    },
+    "CA": {
+      "name": "California",
+      "osb": "Not legal",
+      "igaming": "Not legal",
+      "prediction_markets": "No state action",
+      "horse_racing_online": "Live",
+      "tax_rate_osb": null,
+      "tax_rate_igaming": null,
+      "notes": "Props 26 and 27 failed in Nov 2022. Tribal push expected 2028."
+    },
+    "CO": {
+      "name": "Colorado",
+      "osb": "Live",
+      "igaming": "Not legal",
+      "prediction_markets": "Permitted",
+      "horse_racing_online": "Live",
+      "tax_rate_osb": 0.10,
+      "tax_rate_igaming": null,
+      "notes": "Tax rate increases to 20% Jan 2026 per voter-approved measure."
+    },
+    "CT": {
+      "name": "Connecticut",
+      "osb": "Live",
+      "igaming": "Live",
+      "prediction_markets": "No state action",
+      "horse_racing_online": "Not legal",
+      "tax_rate_osb": 0.135,
+      "tax_rate_igaming": 0.18,
+      "notes": "Tribal compact with Mohegan and Mashantucket Pequot."
+    },
+    "DC": {
+      "name": "Washington D.C.",
+      "osb": "Live",
+      "igaming": "Not legal",
+      "prediction_markets": "No state action",
+      "horse_racing_online": "Not legal",
+      "tax_rate_osb": 0.10,
+      "tax_rate_igaming": null,
+      "notes": "GambetDC lottery app plus retail at venues."
+    },
+    "DE": {
+      "name": "Delaware",
+      "osb": "Live",
+      "igaming": "Live",
+      "prediction_markets": "No state action",
+      "horse_racing_online": "Live",
+      "tax_rate_osb": 0.50,
+      "tax_rate_igaming": 0.15,
+      "notes": "State lottery monopoly model."
+    },
+    "FL": {
+      "name": "Florida",
+      "osb": "Live",
+      "igaming": "Not legal",
+      "prediction_markets": "No state action",
+      "horse_racing_online": "Live",
+      "tax_rate_osb": 0.10,
+      "tax_rate_igaming": null,
+      "notes": "Seminole Tribe Hard Rock Bet operates statewide via tribal-server model."
+    },
+    "GA": {
+      "name": "Georgia",
+      "osb": "Not legal",
+      "igaming": "Not legal",
+      "prediction_markets": "No state action",
+      "horse_racing_online": "Not legal",
+      "tax_rate_osb": null,
+      "tax_rate_igaming": null,
+      "notes": "Legislation repeatedly stalled."
+    },
+    "HI": {
+      "name": "Hawaii",
+      "osb": "Not legal",
+      "igaming": "Not legal",
+      "prediction_markets": "No state action",
+      "horse_racing_online": "Not legal",
+      "tax_rate_osb": null,
+      "tax_rate_igaming": null,
+      "notes": "One of two states with no legal gambling."
+    },
+    "ID": {
+      "name": "Idaho",
+      "osb": "Not legal",
+      "igaming": "Not legal",
+      "prediction_markets": "No state action",
+      "horse_racing_online": "Live",
+      "tax_rate_osb": null,
+      "tax_rate_igaming": null,
+      "notes": "Horse racing via simulcast only."
+    },
+    "IL": {
+      "name": "Illinois",
+      "osb": "Live",
+      "igaming": "Not legal",
+      "prediction_markets": "Permitted",
+      "horse_racing_online": "Live",
+      "tax_rate_osb": 0.15,
+      "tax_rate_igaming": null,
+      "notes": "Tax rate structure tiered; top tier 40% on GGR >$200M/month."
+    },
+    "IN": {
+      "name": "Indiana",
+      "osb": "Live",
+      "igaming": "Not legal",
+      "prediction_markets": "Permitted",
+      "horse_racing_online": "Live",
+      "tax_rate_osb": 0.095,
+      "tax_rate_igaming": null,
+      "notes": ""
+    },
+    "IA": {
+      "name": "Iowa",
+      "osb": "Live",
+      "igaming": "Not legal",
+      "prediction_markets": "No state action",
+      "horse_racing_online": "Live",
+      "tax_rate_osb": 0.065,
+      "tax_rate_igaming": null,
+      "notes": "In-person registration requirement removed 2021."
+    },
+    "KS": {
+      "name": "Kansas",
+      "osb": "Live",
+      "igaming": "Not legal",
+      "prediction_markets": "No state action",
+      "horse_racing_online": "Not legal",
+      "tax_rate_osb": 0.10,
+      "tax_rate_igaming": null,
+      "notes": "State-run model via lottery. 6 retail sportsbooks + online."
+    },
+    "KY": {
+      "name": "Kentucky",
+      "osb": "Live",
+      "igaming": "Not legal",
+      "prediction_markets": "No state action",
+      "horse_racing_online": "Live",
+      "tax_rate_osb": 0.095,
+      "tax_rate_igaming": null,
+      "notes": "Launched Sept 2023. Horse racing ADW long established."
+    },
+    "LA": {
+      "name": "Louisiana",
+      "osb": "Live",
+      "igaming": "Not legal",
+      "prediction_markets": "No state action",
+      "horse_racing_online": "Live",
+      "tax_rate_osb": 0.15,
+      "tax_rate_igaming": null,
+      "notes": "Parish-by-parish opt-in model."
+    },
+    "ME": {
+      "name": "Maine",
+      "osb": "Live",
+      "igaming": "Live",
+      "prediction_markets": "No state action",
+      "horse_racing_online": "Not legal",
+      "tax_rate_osb": 0.16,
+      "tax_rate_igaming": 0.16,
+      "notes": "Launched Jan 2023. Tribal/commercial partnerships."
+    },
+    "MD": {
+      "name": "Maryland",
+      "osb": "Live",
+      "igaming": "Not legal",
+      "prediction_markets": "Permitted",
+      "horse_racing_online": "Live",
+      "tax_rate_osb": 0.15,
+      "tax_rate_igaming": null,
+      "notes": "iGaming legislation active 2025-2026."
+    },
+    "MA": {
+      "name": "Massachusetts",
+      "osb": "Live",
+      "igaming": "Not legal",
+      "prediction_markets": "No state action",
+      "horse_racing_online": "Not legal",
+      "tax_rate_osb": 0.15,
+      "tax_rate_igaming": null,
+      "notes": "Launched March 2023."
+    },
+    "MI": {
+      "name": "Michigan",
+      "osb": "Live",
+      "igaming": "Live",
+      "prediction_markets": "Permitted",
+      "horse_racing_online": "Live",
+      "tax_rate_osb": 0.085,
+      "tax_rate_igaming": 0.20,
+      "notes": "One of strongest iGaming markets. Tribal and commercial."
+    },
+    "MN": {
+      "name": "Minnesota",
+      "osb": "Not legal",
+      "igaming": "Not legal",
+      "prediction_markets": "No state action",
+      "horse_racing_online": "Not legal",
+      "tax_rate_osb": null,
+      "tax_rate_igaming": null,
+      "notes": "Tribal opposition has stalled sports betting bills repeatedly."
+    },
+    "MS": {
+      "name": "Mississippi",
+      "osb": "Live",
+      "igaming": "Not legal",
+      "prediction_markets": "No state action",
+      "horse_racing_online": "Not legal",
+      "tax_rate_osb": 0.12,
+      "tax_rate_igaming": null,
+      "notes": "Retail/on-property mobile only. No statewide online."
+    },
+    "MO": {
+      "name": "Missouri",
+      "osb": "Live",
+      "igaming": "Not legal",
+      "prediction_markets": "No state action",
+      "horse_racing_online": "Not legal",
+      "tax_rate_osb": 0.10,
+      "tax_rate_igaming": null,
+      "notes": "Voters approved Prop GR Nov 2024. Launched 2025."
+    },
+    "MT": {
+      "name": "Montana",
+      "osb": "Live",
+      "igaming": "Not legal",
+      "prediction_markets": "No state action",
+      "horse_racing_online": "Not legal",
+      "tax_rate_osb": 0.085,
+      "tax_rate_igaming": null,
+      "notes": "State lottery model, retail only via kiosks."
+    },
+    "NE": {
+      "name": "Nebraska",
+      "osb": "Live",
+      "igaming": "Not legal",
+      "prediction_markets": "No state action",
+      "horse_racing_online": "Not legal",
+      "tax_rate_osb": 0.20,
+      "tax_rate_igaming": null,
+      "notes": "Retail only at horse racing facilities."
+    },
+    "NV": {
+      "name": "Nevada",
+      "osb": "Live",
+      "igaming": "Not legal",
+      "prediction_markets": "Permitted",
+      "horse_racing_online": "Live",
+      "tax_rate_osb": 0.065,
+      "tax_rate_igaming": null,
+      "notes": "Mobile requires in-person registration. Online poker only for iGaming."
+    },
+    "NH": {
+      "name": "New Hampshire",
+      "osb": "Live",
+      "igaming": "Not legal",
+      "prediction_markets": "No state action",
+      "horse_racing_online": "Live",
+      "tax_rate_osb": 0.51,
+      "tax_rate_igaming": null,
+      "notes": "DraftKings lottery monopoly model."
+    },
+    "NJ": {
+      "name": "New Jersey",
+      "osb": "Live",
+      "igaming": "Live",
+      "prediction_markets": "Permitted",
+      "horse_racing_online": "Live",
+      "tax_rate_osb": 0.085,
+      "tax_rate_igaming": 0.15,
+      "notes": "Pioneer market. Atlantic City casino partnerships required."
+    },
+    "NM": {
+      "name": "New Mexico",
+      "osb": "Live",
+      "igaming": "Not legal",
+      "prediction_markets": "No state action",
+      "horse_racing_online": "Live",
+      "tax_rate_osb": null,
+      "tax_rate_igaming": null,
+      "notes": "Tribal only via existing gaming compacts. No specific tax rate published."
+    },
+    "NY": {
+      "name": "New York",
+      "osb": "Live",
+      "igaming": "Not legal",
+      "prediction_markets": "Permitted",
+      "horse_racing_online": "Live",
+      "tax_rate_osb": 0.51,
+      "tax_rate_igaming": null,
+      "notes": "Highest tax rate in US. iGaming legislation advancing."
+    },
+    "NC": {
+      "name": "North Carolina",
+      "osb": "Live",
+      "igaming": "Not legal",
+      "prediction_markets": "No state action",
+      "horse_racing_online": "Not legal",
+      "tax_rate_osb": 0.18,
+      "tax_rate_igaming": null,
+      "notes": "Launched March 2024."
+    },
+    "ND": {
+      "name": "North Dakota",
+      "osb": "Live",
+      "igaming": "Not legal",
+      "prediction_markets": "No state action",
+      "horse_racing_online": "Not legal",
+      "tax_rate_osb": 0.065,
+      "tax_rate_igaming": null,
+      "notes": "Tribal casinos only, retail-focused."
+    },
+    "OH": {
+      "name": "Ohio",
+      "osb": "Live",
+      "igaming": "Not legal",
+      "prediction_markets": "Permitted",
+      "horse_racing_online": "Live",
+      "tax_rate_osb": 0.20,
+      "tax_rate_igaming": null,
+      "notes": "Tax raised from 10% to 20% in 2023."
+    },
+    "OK": {
+      "name": "Oklahoma",
+      "osb": "Not legal",
+      "igaming": "Not legal",
+      "prediction_markets": "No state action",
+      "horse_racing_online": "Live",
+      "tax_rate_osb": null,
+      "tax_rate_igaming": null,
+      "notes": "Tribal opposition strong. Horse racing ADW via compact."
+    },
+    "OR": {
+      "name": "Oregon",
+      "osb": "Live",
+      "igaming": "Not legal",
+      "prediction_markets": "No state action",
+      "horse_racing_online": "Live",
+      "tax_rate_osb": null,
+      "tax_rate_igaming": null,
+      "notes": "State lottery (Scoreboard app) plus tribal. DraftKings via Coquille tribe."
+    },
+    "PA": {
+      "name": "Pennsylvania",
+      "osb": "Live",
+      "igaming": "Live",
+      "prediction_markets": "Permitted",
+      "horse_racing_online": "Live",
+      "tax_rate_osb": 0.36,
+      "tax_rate_igaming": 0.54,
+      "notes": "Second-largest iGaming market. High tax rate."
+    },
+    "RI": {
+      "name": "Rhode Island",
+      "osb": "Live",
+      "igaming": "Live",
+      "prediction_markets": "No state action",
+      "horse_racing_online": "Not legal",
+      "tax_rate_osb": 0.51,
+      "tax_rate_igaming": 0.30,
+      "notes": "State monopoly model via Twin River/Bally's."
+    },
+    "SC": {
+      "name": "South Carolina",
+      "osb": "Not legal",
+      "igaming": "Not legal",
+      "prediction_markets": "No state action",
+      "horse_racing_online": "Not legal",
+      "tax_rate_osb": null,
+      "tax_rate_igaming": null,
+      "notes": ""
+    },
+    "SD": {
+      "name": "South Dakota",
+      "osb": "Live",
+      "igaming": "Not legal",
+      "prediction_markets": "No state action",
+      "horse_racing_online": "Not legal",
+      "tax_rate_osb": 0.09,
+      "tax_rate_igaming": null,
+      "notes": "Retail only at Deadwood casinos and tribal facilities."
+    },
+    "TN": {
+      "name": "Tennessee",
+      "osb": "Live",
+      "igaming": "Not legal",
+      "prediction_markets": "No state action",
+      "horse_racing_online": "Not legal",
+      "tax_rate_osb": 0.20,
+      "tax_rate_igaming": null,
+      "notes": "Online-only state. No brick-and-mortar casinos. Minimum hold rate required."
+    },
+    "TX": {
+      "name": "Texas",
+      "osb": "Not legal",
+      "igaming": "Not legal",
+      "prediction_markets": "No state action",
+      "horse_racing_online": "Live",
+      "tax_rate_osb": null,
+      "tax_rate_igaming": null,
+      "notes": "Legislature meets biennially. Casino/sports betting stalled repeatedly."
+    },
+    "UT": {
+      "name": "Utah",
+      "osb": "Not legal",
+      "igaming": "Not legal",
+      "prediction_markets": "No state action",
+      "horse_racing_online": "Not legal",
+      "tax_rate_osb": null,
+      "tax_rate_igaming": null,
+      "notes": "Constitutional prohibition on gambling."
+    },
+    "VA": {
+      "name": "Virginia",
+      "osb": "Live",
+      "igaming": "Not legal",
+      "prediction_markets": "Permitted",
+      "horse_racing_online": "Live",
+      "tax_rate_osb": 0.15,
+      "tax_rate_igaming": null,
+      "notes": "iGaming legislation advancing. One of fastest-growing OSB markets."
+    },
+    "VT": {
+      "name": "Vermont",
+      "osb": "Live",
+      "igaming": "Not legal",
+      "prediction_markets": "No state action",
+      "horse_racing_online": "Not legal",
+      "tax_rate_osb": 0.20,
+      "tax_rate_igaming": null,
+      "notes": "Online-only. Launched Jan 2024."
+    },
+    "WA": {
+      "name": "Washington",
+      "osb": "Live",
+      "igaming": "Not legal",
+      "prediction_markets": "No state action",
+      "horse_racing_online": "Live",
+      "tax_rate_osb": null,
+      "tax_rate_igaming": null,
+      "notes": "Tribal-only via compacts. Mobile wagering at tribal facilities."
+    },
+    "WV": {
+      "name": "West Virginia",
+      "osb": "Live",
+      "igaming": "Live",
+      "prediction_markets": "No state action",
+      "horse_racing_online": "Live",
+      "tax_rate_osb": 0.10,
+      "tax_rate_igaming": 0.15,
+      "notes": "Pioneer market. Small market size."
+    },
+    "WI": {
+      "name": "Wisconsin",
+      "osb": "Legal (not launched)",
+      "igaming": "Not legal",
+      "prediction_markets": "No state action",
+      "horse_racing_online": "Not legal",
+      "tax_rate_osb": null,
+      "tax_rate_igaming": null,
+      "notes": "Signed April 9, 2026. Tribal compact negotiations pending before launch."
+    },
+    "WY": {
+      "name": "Wyoming",
+      "osb": "Live",
+      "igaming": "Not legal",
+      "prediction_markets": "No state action",
+      "horse_racing_online": "Not legal",
+      "tax_rate_osb": 0.10,
+      "tax_rate_igaming": null,
+      "notes": "Online-only. Small market."
+    }
+  }
+}

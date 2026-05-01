@@ -1,0 +1,29 @@
+{
+  "output_dir": "output",
+  "amelco_states": ["NJ", "PA", "MI", "NY", "IL", "OH", "CO", "IN",
+                     "VA", "TN", "AZ", "LA", "KS", "KY", "MD",
+                     "CT", "WV"],
+  "news_sources": [
+    {"name": "Pechanga.net", "url": "https://pechanga.net/", "priority": 1},
+    {"name": "Legal Sports Report", "url": "https://www.legalsportsreport.com/", "priority": 2},
+    {"name": "SBC Americas", "url": "https://sbcamericas.com/", "priority": 3},
+    {"name": "Casino.org", "url": "https://www.casino.org/news/", "priority": 4},
+    {"name": "Gambling Insider", "url": "https://www.gamblinginsider.com/", "priority": 5}
+  ],
+  "revenue_sources": [
+    {"name": "RG.org", "url": "https://rg.org/statistics/us"},
+    {"name": "Legal Sports Report", "url": "https://www.legalsportsreport.com/sports-betting-states/revenue/"},
+    {"name": "SportsHandle", "url": "https://sportshandle.com/sports-betting-revenue/"}
+  ],
+  "legislation_sources": [
+    {"name": "Gambling Insider", "url": "https://www.gamblinginsider.com/in-depth/112652/us-gambling-bill-tracker"},
+    {"name": "Legal Sports Report", "url": "https://www.legalsportsreport.com/sports-betting-states/"},
+    {"name": "Bookies.com", "url": "https://bookies.com/news/u-s-gambling-2026-updates-casino-igaming-sports-betting-prediction-markets"}
+  ],
+  "anthropic_model": "claude-sonnet-4-6",
+  "report_date_format": "YYYY-MM-DD",
+  "dashboard_password_hash": "9d5a60f713da07344537adbb8f6d9aa9d988737f1fea4b265d77d175f622a674",
+  "request_delay_seconds": 2,
+  "cache_ttl_hours": 6,
+  "revenue_staleness_days": 90
+}
