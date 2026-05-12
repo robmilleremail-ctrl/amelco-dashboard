@@ -320,7 +320,7 @@ def generate_news_summary(headlines: list[dict], config: dict) -> str:
     if not headlines:
         return "[No headlines fetched — all news sources unavailable this run.]"
 
-    client = anthropic.Anthropic()
+    client = anthropic.Anthropic(timeout=60.0)
     today = today_str()
 
     headlines_text = "\n".join(
@@ -351,7 +351,7 @@ Write only the summary paragraph."""
         response = client.messages.create(
             model=config.get("anthropic_model", "claude-sonnet-4-6"),
             max_tokens=600,
-            messages=[{"role": "user", "content": prompt}]
+            messages=[{"role": "user", "content": prompt}],
         )
         return response.content[0].text.strip()
     except Exception as e:

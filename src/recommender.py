@@ -69,7 +69,7 @@ Rules:
 
 Return only the bulleted recommendations with no preamble or conclusion."""
 
-    client = anthropic.Anthropic()
+    client = anthropic.Anthropic(timeout=60.0)
     try:
         response = client.messages.create(
             model=config.get("anthropic_model", "claude-sonnet-4-6"),
