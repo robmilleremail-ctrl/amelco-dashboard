@@ -140,6 +140,9 @@ def build_html_report(
     else:
         news_html = _headlines_fallback_html(headlines)
 
+    # ── Articles table (Section 5) ────────────────────────────────────────────
+    articles_html = _articles_table_html(headlines)
+
     # ── Stat cards ────────────────────────────────────────────────────────────
     osb_live = status_summary.get("osb_live", 0)
     ig_live  = status_summary.get("igaming_live", 0)
@@ -162,6 +165,8 @@ def build_html_report(
         leg_html=leg_html,
         changed_count=len(changed_bill_ids),
         rec_html=rec_html,
+        articles_html=articles_html,
+        articles_count=len(headlines),
     )
 
 
@@ -308,6 +313,69 @@ def _headlines_fallback_html(headlines: list[dict]) -> str:
 
     html += "</div>"
     return html
+
+
+def _articles_table_html(headlines: list[dict]) -> str:
+    """Render all fetched headlines as a searchable table grouped by source."""
+    if not headlines:
+        return '<p class="muted">No articles fetched this run.</p>'
+
+    # Sort by source then title
+    sorted_headlines = sorted(headlines, key=lambda h: (h.get("source", ""), h.get("title", "")))
+
+    # Source color palette (cycles)
+    source_colors = [
+        "#58a6ff", "#3fb950", "#d29922", "#a371f7",
+        "#e63946", "#79c0ff", "#56d364", "#f78166",
+        "#ffa657", "#39d353", "#ff7b72", "#d2a8ff",
+        "#7ee787",
+    ]
+    # Build source → color map
+    sources_seen: list[str] = []
+    for h in sorted_headlines:
+        s = h.get("source", "")
+        if s not in sources_seen:
+            sources_seen.append(s)
+    source_color_map = {s: source_colors[i % len(source_colors)] for i, s in enumerate(sources_seen)}
+
+    rows = ""
+    for h in sorted_headlines:
+        source = h.get("source", "")
+        title  = h.get("title", "")
+        url    = h.get("url", "#")
+        snippet = h.get("snippet", "")
+        color  = source_color_map.get(source, "#7d8590")
+        snippet_html = f'<div class="art-snippet">{snippet[:160]}{"…" if len(snippet) > 160 else ""}</div>' if snippet else ""
+        rows += f"""
+        <tr>
+          <td class="art-source-cell">
+            <span class="art-source-dot" style="background:{color}"></span>
+            <span class="art-source-name">{source}</span>
+          </td>
+          <td class="art-title-cell">
+            <a href="{url}" target="_blank" rel="noopener" class="art-link">{title}</a>
+            {snippet_html}
+          </td>
+        </tr>"""
+
+    return f"""
+    <div class="table-wrap">
+      <table class="data-table art-table">
+        <thead>
+          <tr>
+            <th style="width:180px">Source</th>
+            <th>Story</th>
+          </tr>
+        </thead>
+        <tbody id="articlesBody">
+          {rows}
+        </tbody>
+      </table>
+    </div>
+    <div class="table-note">
+      {len(headlines)} articles from {len(sources_seen)} sources · Past 14 days ·
+      Click any headline to open the full story
+    </div>"""
 
 
 def add_password_gate(html: str, password_hash: str, run_date: str) -> str:
@@ -747,6 +815,38 @@ def _html_shell(**ctx) -> str:
     margin-top: 3px; line-height: 1.4;
   }}
 
+  /* ── Articles table ── */
+  .art-table .art-source-cell {{
+    white-space: nowrap;
+    vertical-align: top;
+    padding-top: 11px;
+  }}
+  .art-source-dot {{
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    margin-right: 7px;
+    vertical-align: middle;
+    flex-shrink: 0;
+  }}
+  .art-source-name {{
+    font-size: 12px; font-weight: 600;
+    color: var(--muted);
+    vertical-align: middle;
+  }}
+  .art-title-cell {{ padding: 9px 12px; }}
+  .art-link {{
+    color: var(--text);
+    text-decoration: none;
+    font-size: 13px;
+    line-height: 1.45;
+  }}
+  .art-link:hover {{ color: var(--blue); text-decoration: underline; }}
+  .art-snippet {{
+    font-size: 11px; color: var(--muted);
+    margin-top: 3px; line-height: 1.4;
+  }}
+
   /* ── Responsive ── */
   @media (max-width: 768px) {{
     .stats-row {{ grid-template-columns: repeat(2, 1fr); }}
@@ -885,12 +985,35 @@ def _html_shell(**ctx) -> str:
     </div>
   </div>
 
+  <!-- Section 5: Relevant Articles -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <div class="section-title">Relevant Articles</div>
+      <div class="section-meta">{ctx['articles_count']} stories · Past 14 days</div>
+    </div>
+    <div class="section-body">
+      <div class="search-wrap">
+        <input class="search-input" type="text" id="articleSearch"
+               placeholder="Filter articles…" oninput="filterArticles(this.value)">
+      </div>
+      {ctx['articles_html']}
+    </div>
+  </div>
+
 </div><!-- /page-wrap -->
 
 <script>
   function filterStates(q) {{
     q = q.toLowerCase();
     document.querySelectorAll('#stateBody tr').forEach(row => {{
+      row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+    }});
+  }}
+
+  function filterArticles(q) {{
+    q = q.toLowerCase();
+    document.querySelectorAll('#articlesBody tr').forEach(row => {{
       row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
     }});
   }}

@@ -20,11 +20,17 @@ from utils import fetch_page, parse_html, log_error, log_info, log_warning, toda
 
 # RSS feed URLs for each source (tried before HTML scraping)
 RSS_FEEDS = {
-    "Pechanga.net":         "https://pechanga.net/feed/",
-    "Legal Sports Report":  "https://www.legalsportsreport.com/feed/",
-    "SBC Americas":         "https://sbcamericas.com/feed/",
-    "Casino.org":           "https://www.casino.org/news/feed/",
-    "Gambling Insider":     "https://www.gamblinginsider.com/feed/rss",
+    "Pechanga.net":          "https://pechanga.net/feed/",
+    "Legal Sports Report":   "https://www.legalsportsreport.com/feed/",
+    "SBC Americas":          "https://sbcamericas.com/feed/",
+    "Casino.org":            "https://www.casino.org/news/feed/",
+    "Gambling Insider":      "https://www.gamblinginsider.com/feed/rss",
+    "Yogonet":               "https://www.yogonet.com/international/rss.xml",
+    "iGaming Business":      "https://igamingbusiness.com/feed/",
+    "GGB Magazine":          "https://ggbmagazine.com/feed/",
+    "CDC Gaming":            "https://cdcgaming.com/feed/",
+    "American Gaming Assoc": "https://www.americangaming.org/feed/",
+    "Gaming Regulation":     "https://www.gamingregulation.com/news/feed/",
 }
 
 # Minimum headline length to be considered valid (filters out nav/footer noise)
