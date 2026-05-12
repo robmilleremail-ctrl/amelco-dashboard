@@ -134,21 +134,23 @@ def build_html_report(
     # ── Recommendations ───────────────────────────────────────────────────────
     rec_html = _format_recommendations(recommendations)
 
+    # ── Filter headlines to top 5 per source by Amelco relevance ─────────────
+    from news_fetcher import get_display_headlines
+    display_headlines = get_display_headlines(headlines, top_n=5)
+
     # ── News summary ──────────────────────────────────────────────────────────
     if not news_summary.startswith("["):
-        # AI summary succeeded — show paragraph then headlines cards below
+        # AI summary succeeded — show paragraph then top-5 cards below
         news_html = (
             f'<p class="news-body">{news_summary}</p>'
             f'<div class="headlines-divider"></div>'
-            f'{_headlines_cards_html(headlines)}'
+            f'{_headlines_cards_html(display_headlines)}'
         )
     else:
         # No AI summary — show just the cards with unavailable notice
-        news_html = _headlines_fallback_html(headlines)
+        news_html = _headlines_fallback_html(display_headlines)
 
-    # ── Articles table (Section 5) — top 5 per source by Amelco relevance ────
-    from news_fetcher import get_display_headlines
-    display_headlines = get_display_headlines(headlines, top_n=5)
+    # ── Articles table (Section 5) — same filtered set ────────────────────────
     articles_html = _articles_table_html(display_headlines)
 
     # ── Stat cards ────────────────────────────────────────────────────────────
