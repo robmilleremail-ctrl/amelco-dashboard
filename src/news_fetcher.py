@@ -36,6 +36,60 @@ RSS_FEEDS = {
 # Minimum headline length to be considered valid (filters out nav/footer noise)
 MIN_TITLE_LEN = 20
 
+# ── Amelco relevance scoring ──────────────────────────────────────────────────
+# Based on Amelco's business: B2B sportsbook/iGaming technology, US expansion,
+# clients include Flutter/FanDuel, Hard Rock Bet, Fanatics, tribal operators.
+
+_AMELCO_HIGH = [
+    # B2B technology topics — direct relevance
+    "b2b", "platform", "technology provider", "software provider", "supplier",
+    "white label", "integration", "trading service", "risk management",
+    "player account", "pam ", "omni-channel", "retail betting",
+    # Named clients / known operators Amelco works with
+    "hard rock", "fanatics", "flutter", "fanduel", "entain", "bet365",
+    # Market-entry events — potential new states for Amelco clients
+    "legali", "new state", "market launch", "go live", "launch",
+    "compact", "tribal", "igra",
+    # Regulatory / licensing — affects operator clients
+    "license", "permit", "regulat", "compliance",
+    # Partnership / deal signals
+    "partner", "partnership", "deal", "contract", "award", "select",
+    "procure", "vendor", "supplier",
+]
+
+_AMELCO_MEDIUM = [
+    # Broader market context
+    "revenue", "ggr", "handle", "market share", "growth", "expansion",
+    "sports betting", "online casino", "igaming", "online gaming",
+    "prediction market", "kalshi", "polymarket",
+    "draftkings", "betmgm", "penn ", "espnbet", "barstool",
+    "merger", "acquisition", "m&a", "investment",
+    "mobile app", "mobile betting", "app launch",
+    "state", "bill", "legislation", "legalize",
+]
+
+
+def score_amelco_relevance(h: dict) -> int:
+    """Score a headline dict for relevance to Amelco's business (higher = more relevant)."""
+    combined = (h.get("title", "") + " " + h.get("snippet", "")).lower()
+    score = sum(10 for term in _AMELCO_HIGH if term in combined)
+    score += sum(3 for term in _AMELCO_MEDIUM if term in combined)
+    return score
+
+
+def get_display_headlines(headlines: list[dict], top_n: int = 5) -> list[dict]:
+    """Return up to top_n most Amelco-relevant headlines per source, sorted by relevance."""
+    from collections import defaultdict
+    by_source: dict[str, list[dict]] = defaultdict(list)
+    for h in headlines:
+        by_source[h["source"]].append(h)
+
+    result = []
+    for items in by_source.values():
+        ranked = sorted(items, key=score_amelco_relevance, reverse=True)
+        result.extend(ranked[:top_n])
+    return result
+
 # Gaming keywords — at least one must appear in title+snippet for a headline to count
 GAMING_KEYWORDS = [
     "bet", "wager", "gambling", "gaming", "casino", "sportsbook", "lottery",

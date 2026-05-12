@@ -87,16 +87,32 @@ class DashboardHandler(http.server.BaseHTTPRequestHandler):
                 timeout=300,
             )
             success = result.returncode == 0
+            pub_url = None
+            if success:
+                print("[server] Done. Publishing to GitHub Pages...")
+                try:
+                    sys.path.insert(0, str(SRC_DIR))
+                    from publisher import publish, PAGES_URL
+                    ok, msg = publish(PROJECT_ROOT, OUTPUT_DIR)
+                    if ok:
+                        pub_url = PAGES_URL
+                        print(f"[server] Published → {PAGES_URL}")
+                    else:
+                        print(f"[server] Publish warning: {msg}")
+                except Exception as pub_err:
+                    print(f"[server] Publish error: {pub_err}")
+
             status = {
                 "ok": success,
-                "message": "Refresh complete." if success else "Refresh failed — check terminal."
+                "message": "Refresh complete." if success else "Refresh failed — check terminal.",
+                "pages_url": pub_url,
             }
             self._cors_headers(200)
             self.send_header("Content-Type", "application/json")
             self.end_headers()
             self.wfile.write(json.dumps(status).encode())
             if success:
-                print("[server] Done. Serving updated report.")
+                print("[server] Serving updated report.")
         except subprocess.TimeoutExpired:
             self._json_error("Refresh timed out after 5 minutes.")
         except Exception as e:

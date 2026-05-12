@@ -146,8 +146,10 @@ def build_html_report(
         # No AI summary — show just the cards with unavailable notice
         news_html = _headlines_fallback_html(headlines)
 
-    # ── Articles table (Section 5) ────────────────────────────────────────────
-    articles_html = _articles_table_html(headlines)
+    # ── Articles table (Section 5) — top 5 per source by Amelco relevance ────
+    from news_fetcher import get_display_headlines
+    display_headlines = get_display_headlines(headlines, top_n=5)
+    articles_html = _articles_table_html(display_headlines)
 
     # ── Stat cards ────────────────────────────────────────────────────────────
     osb_live = status_summary.get("osb_live", 0)
@@ -172,7 +174,8 @@ def build_html_report(
         changed_count=len(changed_bill_ids),
         rec_html=rec_html,
         articles_html=articles_html,
-        articles_count=len(headlines),
+        articles_count=len(display_headlines),
+        total_headlines=len(headlines),
     )
 
 
@@ -1002,7 +1005,7 @@ def _html_shell(**ctx) -> str:
     <div class="section-header">
       <div class="section-num">5</div>
       <div class="section-title">Relevant Articles</div>
-      <div class="section-meta">{ctx['articles_count']} stories · Past 14 days</div>
+      <div class="section-meta">Top 5 per source · {ctx['articles_count']} shown of {ctx['total_headlines']} fetched</div>
     </div>
     <div class="section-body">
       <div class="search-wrap">
@@ -1053,7 +1056,8 @@ def _html_shell(**ctx) -> str:
       }});
       const data = await res.json();
       if (data.ok) {{
-        showToast('✓ Data refreshed — reloading…', 'ok');
+        const pub = data.pages_url ? ` · Published → ${data.pages_url}` : '';
+        showToast('✓ Data refreshed — reloading…' + pub, 'ok');
         setTimeout(() => window.location.reload(), 1200);
       }} else {{
         showToast('⚠ ' + data.message, 'err');
