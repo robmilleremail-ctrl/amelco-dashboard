@@ -136,8 +136,14 @@ def build_html_report(
 
     # ── News summary ──────────────────────────────────────────────────────────
     if not news_summary.startswith("["):
-        news_html = f'<p class="news-body">{news_summary}</p>'
+        # AI summary succeeded — show paragraph then headlines cards below
+        news_html = (
+            f'<p class="news-body">{news_summary}</p>'
+            f'<div class="headlines-divider"></div>'
+            f'{_headlines_cards_html(headlines)}'
+        )
     else:
+        # No AI summary — show just the cards with unavailable notice
         news_html = _headlines_fallback_html(headlines)
 
     # ── Articles table (Section 5) ────────────────────────────────────────────
@@ -271,26 +277,23 @@ def _format_recommendations(text: str) -> str:
     return cards if cards else f'<p class="muted">{text}</p>'
 
 
-def _headlines_fallback_html(headlines: list[dict]) -> str:
-    """Render raw headlines as styled cards grouped by source."""
+def _headlines_cards_html(headlines: list[dict]) -> str:
+    """Render headlines as styled source cards (no unavailable notice)."""
     if not headlines:
         return '<p class="muted">No headlines fetched this run. Check source availability.</p>'
 
-    # Group by source
     from collections import defaultdict
     by_source: dict[str, list[dict]] = defaultdict(list)
     for h in headlines:
         by_source[h["source"]].append(h)
 
-    # Source color palette
     source_colors = [
         "#58a6ff", "#3fb950", "#d29922", "#a371f7",
-        "#e63946", "#79c0ff", "#56d364",
+        "#e63946", "#79c0ff", "#56d364", "#f78166",
+        "#ffa657", "#39d353", "#ff7b72", "#d2a8ff",
     ]
 
-    html = '<div class="ai-notice">AI summary unavailable — showing raw headlines. Add Anthropic API credits to enable synthesis.</div>'
-    html += '<div class="headlines-grid">'
-
+    html = '<div class="headlines-grid">'
     for i, (source, items) in enumerate(by_source.items()):
         color = source_colors[i % len(source_colors)]
         items_html = ""
@@ -304,15 +307,19 @@ def _headlines_fallback_html(headlines: list[dict]) -> str:
               </div>
               {f'<div class="headline-snippet">{snippet[:180]}{"…" if len(snippet)>180 else ""}</div>' if snippet else ""}
             </div>"""
-
         html += f"""
         <div class="source-block">
           <div class="source-label" style="border-left-color:{color}; color:{color}">{source}</div>
           {items_html}
         </div>"""
-
     html += "</div>"
     return html
+
+
+def _headlines_fallback_html(headlines: list[dict]) -> str:
+    """Render headlines with an AI-unavailable notice (used when summary fails)."""
+    notice = '<div class="ai-notice">AI summary unavailable — showing raw headlines. Check your Anthropic API key.</div>'
+    return notice + _headlines_cards_html(headlines)
 
 
 def _articles_table_html(headlines: list[dict]) -> str:
@@ -615,8 +622,13 @@ def _html_shell(**ctx) -> str:
   .news-body {{
     font-size: 14px; line-height: 1.75;
     color: var(--text); max-width: 900px;
+    margin-bottom: 4px;
   }}
   .sources-note {{ margin-top: 12px; font-size: 12px; color: var(--muted); }}
+  .headlines-divider {{
+    border-top: 1px solid var(--border);
+    margin: 20px 0 16px;
+  }}
 
   /* ── Alert ── */
   .alert {{

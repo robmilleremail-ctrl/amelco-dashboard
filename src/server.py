@@ -68,6 +68,17 @@ class DashboardHandler(http.server.BaseHTTPRequestHandler):
         print("\n[server] Refresh triggered — running main.py...")
         try:
             env = os.environ.copy()
+            # Load ANTHROPIC_API_KEY from ~/.zshrc if not already in env
+            if not env.get("ANTHROPIC_API_KEY"):
+                zshrc = Path.home() / ".zshrc"
+                if zshrc.exists():
+                    for line in zshrc.read_text().splitlines():
+                        if line.startswith("export ANTHROPIC_API_KEY="):
+                            key = line.split("=", 1)[1].strip().strip('"').strip("'")
+                            if key:
+                                env["ANTHROPIC_API_KEY"] = key
+                                print(f"[server] Loaded API key from ~/.zshrc")
+                            break
             result = subprocess.run(
                 [sys.executable, str(SRC_DIR / "main.py")],
                 cwd=str(PROJECT_ROOT),
