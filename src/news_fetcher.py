@@ -287,6 +287,17 @@ def _web_search_fallback(source_name: str, source_url: str, config: dict) -> lis
             return []
 
         headlines = []
+
+        # Reject responses where Claude is declining/hedging rather than providing headlines
+        refusal_signals = [
+            "i want to be upfront", "i cannot fabricate", "i don't have access",
+            "i can't confirm", "based on search indexing", "i was unable",
+            "no results found", "i couldn't find", "i am unable",
+        ]
+        if any(sig in text.lower() for sig in refusal_signals):
+            log_warning(f"  Web search fallback for {source_name} returned a refusal — skipping")
+            return []
+
         for line in text.split("\n"):
             m = re.search(r"HEADLINE:\s*(.+?)\s*\|\s*SUMMARY:\s*(.+)", line)
             if m:
@@ -294,16 +305,19 @@ def _web_search_fallback(source_name: str, source_url: str, config: dict) -> lis
                 snippet = m.group(2).strip()
                 if len(title) >= MIN_TITLE_LEN:
                     headlines.append({
-                        "source": f"{source_name}",
+                        "source": source_name,
                         "title": title[:200],
                         "snippet": snippet[:300],
                         "url": source_url,
                     })
             elif line.strip() and not line.startswith("[") and len(line.strip()) >= MIN_TITLE_LEN:
-                clean = re.sub(r"^[\d\.\-\*•]+\s*", "", line.strip())
+                clean = re.sub(r"^[\d\.\-\*•\*\*]+\s*", "", line.strip()).strip("*")
+                # Skip lines that look like disclaimers or meta-commentary
+                if clean.lower().startswith(("note:", "disclaimer", "source:", "based on", "please")):
+                    continue
                 if any(kw in clean.lower() for kw in GAMING_KEYWORDS):
                     headlines.append({
-                        "source": f"{source_name}",
+                        "source": source_name,
                         "title": clean[:200],
                         "snippet": "",
                         "url": source_url,

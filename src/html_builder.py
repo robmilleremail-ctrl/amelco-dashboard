@@ -1058,7 +1058,7 @@ def _html_shell(**ctx) -> str:
       }});
       const data = await res.json();
       if (data.ok) {{
-        const pub = data.pages_url ? ` · Published → ${data.pages_url}` : '';
+        const pub = data.pages_url ? ' · Published → ' + data.pages_url : '';
         showToast('✓ Data refreshed — reloading…' + pub, 'ok');
         setTimeout(() => window.location.reload(), 1200);
       }} else {{
