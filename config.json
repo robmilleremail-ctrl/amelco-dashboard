@@ -29,6 +29,8 @@
     {"name": "Bookies.com", "url": "https://bookies.com/news/u-s-gambling-2026-updates-casino-igaming-sports-betting-prediction-markets"}
   ],
   "anthropic_model": "claude-sonnet-4-6",
+  "summary_model": "claude-haiku-4-5",
+  "web_search_fallback": false,
   "report_date_format": "YYYY-MM-DD",
   "dashboard_password_hash": "9d5a60f713da07344537adbb8f6d9aa9d988737f1fea4b265d77d175f622a674",
   "request_delay_seconds": 2,

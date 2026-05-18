@@ -25,7 +25,7 @@ def generate_recommendations(
     except FileNotFoundError:
         amelco_context = "[amelco_context.md not found]"
 
-    high_bills = [b for b in active_bills if b.get("amelco_relevance") == "High"]
+    high_bills = [b for b in active_bills if b.get("amelco_relevance") == "High"][:5]
     bills_text = _format_bills_for_prompt(high_bills)
     revenue_text = _format_revenue_for_prompt(revenue_map, config)
 
@@ -73,7 +73,7 @@ Return only the bulleted recommendations with no preamble or conclusion."""
     try:
         response = client.messages.create(
             model=config.get("anthropic_model", "claude-sonnet-4-6"),
-            max_tokens=1200,
+            max_tokens=800,
             messages=[{"role": "user", "content": prompt}]
         )
         return response.content[0].text.strip()

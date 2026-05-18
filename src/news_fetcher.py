@@ -111,10 +111,12 @@ def fetch_headlines(config: dict) -> tuple[list[dict], list[str]]:
         url = source["url"]
         log_info(f"Fetching news from {name}...")
 
+        use_web_search = config.get("web_search_fallback", False)
         headlines = (
             _try_rss(name, delay)
             or _try_html(name, url, delay)
-            or _web_search_fallback(name, url, config)
+            or (use_web_search and _web_search_fallback(name, url, config))
+            or []
         )
 
         if headlines:
@@ -337,9 +339,11 @@ def generate_news_summary(headlines: list[dict], config: dict) -> str:
     client = anthropic.Anthropic(timeout=60.0)
     today = today_str()
 
+    # Use cheaper model for summarization; cap at 20 headlines to reduce tokens
+    model = config.get("summary_model", "claude-haiku-4-5")
     headlines_text = "\n".join(
-        f"- [{h['source']}] {h['title']}" + (f": {h['snippet']}" if h['snippet'] else "")
-        for h in headlines[:40]
+        f"- [{h['source']}] {h['title']}" + (f": {h['snippet'][:120]}" if h['snippet'] else "")
+        for h in headlines[:20]
     )
 
     prompt = f"""You are preparing a weekly briefing for the US Strategic Partner of Amelco, a UK-based B2B betting technology provider.
@@ -363,8 +367,8 @@ Write only the summary paragraph."""
 
     try:
         response = client.messages.create(
-            model=config.get("anthropic_model", "claude-sonnet-4-6"),
-            max_tokens=600,
+            model=model,
+            max_tokens=400,
             messages=[{"role": "user", "content": prompt}],
         )
         return response.content[0].text.strip()
