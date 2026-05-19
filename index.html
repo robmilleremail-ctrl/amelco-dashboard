@@ -1,0 +1,2512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amelco US Gaming Dashboard — 2026-05-19</title>
+<style>
+  :root {
+    --bg:        #0d1117;
+    --surface:   #161b22;
+    --surface2:  #1c2128;
+    --border:    #30363d;
+    --text:      #e6edf3;
+    --muted:     #7d8590;
+    --red:       #e63946;
+    --red-dim:   #7d1c22;
+    --green:     #3fb950;
+    --green-dim: #1a4227;
+    --yellow:    #d29922;
+    --yellow-dim:#3d2f0a;
+    --blue:      #58a6ff;
+    --blue-dim:  #0d2044;
+    --purple:    #a371f7;
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    --mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 14px; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── Layout ── */
+  .page-wrap { max-width: 1400px; margin: 0 auto; padding: 0 24px 60px; }
+
+  /* ── Header ── */
+  .site-header {
+    border-bottom: 1px solid var(--border);
+    padding: 20px 0 16px;
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .logo-bar { display: flex; align-items: center; gap: 12px; flex: 1; }
+  .logo-mark {
+    width: 36px; height: 36px; border-radius: 6px;
+    background: var(--red); display: flex; align-items: center;
+    justify-content: center; font-weight: 800; font-size: 18px; color: #fff;
+    flex-shrink: 0;
+  }
+  .logo-text { font-size: 18px; font-weight: 600; }
+  .logo-sub { font-size: 12px; color: var(--muted); margin-top: 1px; }
+  .header-date { font-size: 13px; color: var(--muted); text-align: right; line-height: 1.7; }
+  .header-date strong { color: var(--text); }
+  .refresh-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 14px; border-radius: 6px;
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text); font-size: 13px; font-weight: 500;
+    cursor: pointer; transition: border-color 0.15s, background 0.15s;
+    white-space: nowrap; margin-top: 8px;
+  }
+  .refresh-btn:hover { border-color: var(--blue); background: var(--blue-dim); }
+  .refresh-btn.loading { opacity: 0.6; cursor: not-allowed; }
+  .refresh-btn .spin { display: none; }
+  .refresh-btn.loading .spin { display: inline; animation: spin 0.8s linear infinite; }
+  .refresh-btn.loading .icon { display: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .refresh-toast {
+    position: fixed; bottom: 24px; right: 24px; z-index: 999;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 12px 18px;
+    font-size: 13px; color: var(--text);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    transition: opacity 0.3s; opacity: 0; pointer-events: none;
+  }
+  .refresh-toast.show { opacity: 1; }
+  .refresh-toast.ok { border-color: var(--green); }
+  .refresh-toast.err { border-color: var(--red); }
+
+  /* ── Stat cards ── */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 18px;
+  }
+  .stat-card .stat-num {
+    font-size: 28px; font-weight: 700; line-height: 1;
+    color: var(--text); margin-bottom: 4px;
+  }
+  .stat-card .stat-label {
+    font-size: 12px; color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .stat-card.accent { border-color: var(--red-dim); }
+  .stat-card.accent .stat-num { color: var(--red); }
+
+  /* ── Sections ── */
+  .section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+  .section-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-num {
+    background: var(--red); color: #fff;
+    font-size: 11px; font-weight: 700;
+    width: 22px; height: 22px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .section-title { font-size: 15px; font-weight: 600; flex: 1; }
+  .section-meta { font-size: 12px; color: var(--muted); }
+  .section-body { padding: 20px; }
+
+  /* ── News ── */
+  .news-body {
+    font-size: 14px; line-height: 1.75;
+    color: var(--text); max-width: 900px;
+    margin-bottom: 4px;
+  }
+  .sources-note { margin-top: 12px; font-size: 12px; color: var(--muted); }
+  .headlines-divider {
+    border-top: 1px solid var(--border);
+    margin: 20px 0 16px;
+  }
+
+  /* ── Alert ── */
+  .alert {
+    background: #271a0a; border: 1px solid #5a3a10;
+    border-radius: 6px; padding: 12px 16px;
+    font-size: 13px; margin-bottom: 16px; color: #e8c472;
+  }
+  .alert ul { margin: 6px 0 0 16px; }
+  .alert li { margin: 2px 0; }
+
+  /* ── Tables ── */
+  .table-wrap {
+    overflow-x: auto;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+  }
+  .data-table {
+    width: 100%; border-collapse: collapse;
+    font-size: 13px;
+  }
+  .data-table thead tr {
+    background: var(--surface2);
+  }
+  .data-table th {
+    padding: 10px 12px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+    position: sticky; top: 0;
+    background: var(--surface2);
+  }
+  .data-table td {
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  .data-table tbody tr:last-child td { border-bottom: none; }
+  .data-table tbody tr:hover { background: var(--surface2); }
+  .amelco-row { background: rgba(230,57,70,0.04); }
+  .amelco-row:hover { background: rgba(230,57,70,0.08) !important; }
+  .changed-row { background: rgba(88,166,255,0.04); }
+
+  /* Table cells */
+  .state-cell { white-space: nowrap; }
+  .state-code {
+    font-family: var(--mono); font-size: 12px; font-weight: 700;
+    color: var(--blue); margin-right: 6px;
+  }
+  .state-name { color: var(--text); }
+  .amelco-badge {
+    font-size: 10px; font-weight: 600;
+    background: var(--red-dim); color: var(--red);
+    border-radius: 4px; padding: 1px 5px; margin-left: 6px;
+  }
+  .num { text-align: right; font-variant-numeric: tabular-nums; font-family: var(--mono); font-size: 12px; }
+  .muted { color: var(--muted); }
+  .na { color: var(--border); }
+
+  /* ── Badges ── */
+  .badge {
+    display: inline-block; padding: 2px 8px;
+    border-radius: 20px; font-size: 11px; font-weight: 600;
+    white-space: nowrap;
+  }
+  .badge-live    { background: var(--green-dim); color: var(--green); }
+  .badge-pending { background: var(--yellow-dim); color: var(--yellow); }
+  .badge-bill    { background: var(--blue-dim); color: var(--blue); }
+  .badge-no      { color: var(--border); font-size: 13px; }
+
+  /* ── Status pills ── */
+  .pill {
+    display: inline-block; padding: 2px 8px;
+    border-radius: 4px; font-size: 11px; font-weight: 500;
+    white-space: nowrap;
+  }
+  .pill-signed     { background: var(--green-dim); color: var(--green); }
+  .pill-passed     { background: #0d2a1a; color: #56d364; }
+  .pill-passed1    { background: #0d2a1a; color: #56d364; opacity: 0.7; }
+  .pill-committee  { background: var(--blue-dim); color: var(--blue); }
+  .pill-incommittee{ background: #0d1a2e; color: #79c0ff; }
+  .pill-gov        { background: #2d1f6e; color: #a371f7; }
+  .pill-vetoed     { background: var(--red-dim); color: var(--red); }
+  .pill-dead       { background: #1c1c1c; color: #6e7681; }
+  .pill-intro      { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+
+  /* ── Category tags ── */
+  .cat-tag {
+    display: inline-block; padding: 2px 7px;
+    border-radius: 4px; font-size: 11px;
+    background: var(--surface2); color: var(--muted);
+    border: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  /* ── YoY ── */
+  .yoy-up   { color: var(--green); font-weight: 700; }
+  .yoy-down { color: var(--red); font-weight: 700; }
+  .yoy-pos  { color: #56d364; }
+  .yoy-neg  { color: #f47067; }
+
+  /* ── Legislation ── */
+  .bill-group { margin-bottom: 24px; }
+  .bill-group:last-child { margin-bottom: 0; }
+  .bill-tier-label {
+    font-size: 13px; font-weight: 600;
+    margin-bottom: 10px; padding-left: 2px;
+  }
+  .tag-high  { color: var(--red); }
+  .tag-med   { color: var(--yellow); }
+  .tag-low   { color: var(--muted); }
+  .leg-table .summary-cell { max-width: 320px; color: var(--muted); font-size: 12px; }
+  code {
+    font-family: var(--mono); font-size: 12px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 4px; padding: 1px 6px;
+    color: var(--purple);
+  }
+
+  /* ── Recommendations ── */
+  .rec-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--red);
+    border-radius: 6px;
+    padding: 16px 18px;
+    margin-bottom: 12px;
+  }
+  .rec-card:last-child { margin-bottom: 0; }
+  .rec-header { margin-bottom: 6px; }
+  .rec-title {
+    font-weight: 700; font-size: 14px; color: var(--text);
+    margin-right: 8px;
+  }
+  .rec-action { color: var(--muted); font-size: 13px; }
+  .rec-body { font-size: 13px; color: var(--muted); line-height: 1.65; }
+
+  /* ── Table footer note ── */
+  .table-note {
+    font-size: 11px; color: var(--muted);
+    padding: 10px 12px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* ── Search box ── */
+  .search-wrap { margin-bottom: 12px; }
+  .search-input {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 6px; color: var(--text); padding: 8px 12px;
+    font-size: 13px; width: 280px; outline: none;
+    font-family: var(--font);
+  }
+  .search-input:focus { border-color: var(--blue); }
+  .search-input::placeholder { color: var(--muted); }
+
+  /* ── Headlines fallback ── */
+  .ai-notice {
+    background: #1a1a2e; border: 1px solid #2d2d5e;
+    border-radius: 6px; padding: 10px 14px;
+    font-size: 12px; color: #7d8590; margin-bottom: 16px;
+  }
+  .headlines-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+  }
+  .source-block {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+  .source-label {
+    font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    padding-left: 8px;
+    border-left: 3px solid;
+    margin-bottom: 12px;
+  }
+  .headline-item {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .headline-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .headline-title a {
+    color: var(--text); text-decoration: none;
+    font-size: 13px; line-height: 1.4;
+  }
+  .headline-title a:hover { color: var(--blue); text-decoration: underline; }
+  .headline-snippet {
+    font-size: 11px; color: var(--muted);
+    margin-top: 3px; line-height: 1.4;
+  }
+
+  /* ── Articles table ── */
+  .art-table .art-source-cell {
+    white-space: nowrap;
+    vertical-align: top;
+    padding-top: 11px;
+  }
+  .art-source-dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    margin-right: 7px;
+    vertical-align: middle;
+    flex-shrink: 0;
+  }
+  .art-source-name {
+    font-size: 12px; font-weight: 600;
+    color: var(--muted);
+    vertical-align: middle;
+  }
+  .art-title-cell { padding: 9px 12px; }
+  .art-link {
+    color: var(--text);
+    text-decoration: none;
+    font-size: 13px;
+    line-height: 1.45;
+  }
+  .art-link:hover { color: var(--blue); text-decoration: underline; }
+  .art-snippet {
+    font-size: 11px; color: var(--muted);
+    margin-top: 3px; line-height: 1.4;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .search-input { width: 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="logo-bar">
+      <div class="logo-mark">A</div>
+      <div>
+        <div class="logo-text">Amelco US Gaming Dashboard</div>
+        <div class="logo-sub">Weekly Briefing · US Strategic Partner</div>
+      </div>
+    </div>
+    <div class="header-date">
+      <strong>2026-05-19</strong><br>
+      Sources checked <span id="checkedAt">2026-05-19 15:20 UTC</span>
+      <br>
+      <button class="refresh-btn" id="refreshBtn" onclick="triggerRefresh()">
+        <span class="icon">↻</span>
+        <span class="spin">↻</span>
+        Refresh Data
+      </button>
+    </div>
+  </header>
+
+  <div class="refresh-toast" id="toast"></div>
+
+  <!-- Stat cards -->
+  <div class="stats-row">
+    <div class="stat-card accent">
+      <div class="stat-num">39</div>
+      <div class="stat-label">States — Live OSB</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">8</div>
+      <div class="stat-label">States — Live iGaming</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">1</div>
+      <div class="stat-label">OSB Legal, Not Launched</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">35</div>
+      <div class="stat-label">States w/ Revenue Data</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">67</div>
+      <div class="stat-label">Active Bills Tracked</div>
+    </div>
+  </div>
+
+  <div class="alert"><strong>⚠ Sources unavailable this run:</strong><ul><li><strong>News:</strong> Pechanga.net, iGaming Business, GGB Magazine, Gaming Regulation, IAGR, NCLGS</li><li><strong>Revenue:</strong> Legal Sports Report</li><li><strong>Legislation:</strong> Gambling Insider, Legal Sports Report</li></ul></div>
+
+  <!-- Section 1: News -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <div class="section-title">Weekly News Summary</div>
+      <div class="section-meta">Past 7 days</div>
+    </div>
+    <div class="section-body">
+      <div class="ai-notice">AI summary unavailable — showing raw headlines. Check your Anthropic API key.</div><div class="headlines-grid">
+        <div class="source-block">
+          <div class="source-label" style="border-left-color:#58a6ff; color:#58a6ff">Legal Sports Report</div>
+          
+            <div class="headline-item">
+              <div class="headline-title">
+                <a href="https://www.legalsportsreport.com/263559/compact-language-key-in-ho-chunk-case-against-kalshi/" target="_blank" rel="noopener">Compact Language Key In Ho-Chunk Case Against Kalshi</a>
+              </div>
+              <div class="headline-snippet">Language in the Ho-Chunk Nation&#8216;s tribal compact with the state of Wisconsin was a key factor in a District Court ruling that allows its case against Kalshi to continue. The …</div>
+            </div>
+            <div class="headline-item">
+              <div class="headline-title">
+                <a href="https://www.legalsportsreport.com/263029/flutter-execs-directors-buy-shares-as-stock-lingers-near-low/" target="_blank" rel="noopener">Flutter Execs, Directors Buy Shares As Stock Lingers Near Low</a>
+              </div>
+              <div class="headline-snippet">Seven Flutter insiders including CEO Peter Jackson have bought company stock on the open market as the FanDuel parent hovers near a 52-week low. The stock has been down since May 7…</div>
+            </div>
+            <div class="headline-item">
+              <div class="headline-title">
+                <a href="https://www.legalsportsreport.com/262958/fanduel-needs-to-get-its-mojo-back-flutter-ceo-says/" target="_blank" rel="noopener">FanDuel Needs To ‘Get Its Mojo Back,’ Flutter CEO Says</a>
+              </div>
+              <div class="headline-snippet">FanDuel parent Flutter is becoming more explicit about what went wrong in its U.S. sportsbook business. Following the FanDuel leadership shakeup last week, Flutter CEO Peter Jackso…</div>
+            </div>
+            <div class="headline-item">
+              <div class="headline-title">
+                <a href="https://www.legalsportsreport.com/263242/report-ballys-beats-betrivers-parent-for-second-ri-sportsbook-license/" target="_blank" rel="noopener">Report: Bally’s Beats BetRivers Parent For Second RI Sportsbook License</a>
+              </div>
+              <div class="headline-snippet">The operator of both casinos in Rhode Island has won a second sports betting license in the state, as Bally&#8217;s beat out Rush Street Interactive&#8216;s BetRivers, according to…</div>
+            </div>
+            <div class="headline-item">
+              <div class="headline-title">
+                <a href="https://www.legalsportsreport.com/262629/draftkings-presses-prediction-market-advantage-as-fanduel-refines-sportsbook-strategy/" target="_blank" rel="noopener">DraftKings Presses Prediction Market Advantage As FanDuel Refines Sportsbook Strategy</a>
+              </div>
+              <div class="headline-snippet">DraftKings used its earnings to show prediction markets are already making money and improving the broader economics of the business. DraftKings reported stronger-than-expected fir…</div>
+            </div>
+        </div>
+        <div class="source-block">
+          <div class="source-label" style="border-left-color:#3fb950; color:#3fb950">SBC Americas</div>
+          
+            <div class="headline-item">
+              <div class="headline-title">
+                <a href="https://sbcamericas.com/2026/05/15/rhode-island-ballys-sports-betting/" target="_blank" rel="noopener">Rhode Island expands sports betting market with Bally’s license: report</a>
+              </div>
+              <div class="headline-snippet">Bally’s Corporation is continuing to solidify its footprint in Rhode Island’s commercial gaming market after being awarded a vendor license to expand its presence in the state. Acc…</div>
+            </div>
+            <div class="headline-item">
+              <div class="headline-title">
+                <a href="https://sbcamericas.com/2026/05/19/kalshi-first-prediction-market-ncpg/" target="_blank" rel="noopener">Kalshi emerges as first prediction market to secure NCPG membership</a>
+              </div>
+              <div class="headline-snippet">Kalshi and the National Council on Problem Gambling (NCPG) have agreed to a landmark deal, making Kalshi the first prediction market to join the non-profit organization. On Monday,…</div>
+            </div>
+            <div class="headline-item">
+              <div class="headline-title">
+                <a href="https://sbcamericas.com/2026/05/18/hebert-louisiana-responsible-gaming/" target="_blank" rel="noopener">Q+A: Christopher Hebert on how Louisiana addresses responsible gaming</a>
+              </div>
+              <div class="headline-snippet">As chairman of the Louisiana Gaming Control Board, Christopher Hebert deals with the constantly evolving challenges in reaching and helping problem gamblers every day. Hebert playe…</div>
+            </div>
+            <div class="headline-item">
+              <div class="headline-title">
+                <a href="https://sbcamericas.com/2026/05/15/prediction-market-weekly-sbc-nfl-kalshi/" target="_blank" rel="noopener">Prediction Markets Weekly: NFL sends letter to the CFTC, Kalshi teams up with MSG</a>
+              </div>
+              <div class="headline-snippet">The burgeoning U.S. prediction market sector closed a busy week of activity. Each Friday at SBC Americas, we highlight some of the biggest headlines and stories you may have missed…</div>
+            </div>
+            <div class="headline-item">
+              <div class="headline-title">
+                <a href="https://sbcamericas.com/2026/05/19/draftkings-cfo-ellingson-chat-takeaways/" target="_blank" rel="noopener">What we learned in DraftKings CFO Alan Ellingson’s fireside chat</a>
+              </div>
+              <div class="headline-snippet">Thursday&#8217;s MoffettNathanson fireside chat with DraftKings CFO Alan Ellingson provided a handful of intriguing insights into the planned next evolution of the U.S. online gami…</div>
+            </div>
+        </div>
+        <div class="source-block">
+          <div class="source-label" style="border-left-color:#d29922; color:#d29922">Casino.org</div>
+          
+            <div class="headline-item">
+              <div class="headline-title">
+                <a href="https://www.casino.org/news/5-9-trillion-illegal-online-gambling-market-is-worlds-third-largest-economy-says-cgi/" target="_blank" rel="noopener">$5.9 Trillion Illegal Online Gambling Market is ‘World’s Third-Largest Economy,’ Says GCI</a>
+              </div>
+              <div class="headline-snippet">GCI says unregulated gambling generated $5.9 trillion in global wagering handle Handle measures betting turnover, not actual gambling operator revenue retained GCI warns “unacknowl…</div>
+            </div>
+            <div class="headline-item">
+              <div class="headline-title">
+                <a href="https://www.casino.org/news/kalshi-joins-the-national-council-on-problem-gambling/" target="_blank" rel="noopener">Kalshi Says It Isn’t a Gambling Platform But Nonetheless Joins the National Council on Problem Gambling</a>
+              </div>
+              <div class="headline-snippet">Kalshi and the National Council on Problem Gambling are partnering to promote responsible trading The prediction market maintains that it isn&#8217;t a gambling operator but a fina…</div>
+            </div>
+            <div class="headline-item">
+              <div class="headline-title">
+                <a href="https://www.casino.org/news/congress-pushes-game-act-stop-sports-betting-ads-targeting-kids/" target="_blank" rel="noopener">Congress Pushes GAME Act to Stop Sports Betting Ads From Targeting Kids Online</a>
+              </div>
+              <div class="headline-snippet">The GAME Act would make it a federal offense for a major social media platform to allow an advertisement targeting minors with sports betting products or services The legislation w…</div>
+            </div>
+            <div class="headline-item">
+              <div class="headline-title">
+                <a href="https://www.casino.org/news/jefferies-monarch-casino-sees-attractive-ma-environment/" target="_blank" rel="noopener">Jefferies: Monarch Casino Sees Attractive M&A Environment</a>
+              </div>
+              <div class="headline-snippet">Analyst claims M&#38;A could be “most likely avenue” for growth for operator after discussions with management Monarch management sees deep pool of potential opportunities The oper…</div>
+            </div>
+            <div class="headline-item">
+              <div class="headline-title">
+                <a href="https://www.casino.org/news/poker-player-loses-100000-lawsuit-against-hippodrome-casino-ban/" target="_blank" rel="noopener">Poker Player Loses £100,000 Lawsuit Against Hippodrome Casino Ban</a>
+              </div>
+              <div class="headline-snippet">Poker player loses £100,000 lawsuit against London’s Hippodrome Casino Casino ban followed complaints about controversial “hit-and-run” poker strategy Judge rejects racial discrimi…</div>
+            </div>
+        </div>
+        <div class="source-block">
+          <div class="source-label" style="border-left-color:#a371f7; color:#a371f7">Gambling Insider</div>
+          
+            <div class="headline-item">
+              <div class="headline-title">
+                <a href="https://www.gamblinginsider.com/news" target="_blank" rel="noopener">InsideKnowledge.GamblingExpertisesince2010.</a>
+              </div>
+              <div class="headline-snippet">A new Wall Street Journal investigation into Polymarket’s dispute-resolution system is expanding scrutiny of the mechanics of market resolution. Over the past year, the rapid rise …</div>
+            </div>
+        </div>
+        <div class="source-block">
+          <div class="source-label" style="border-left-color:#e63946; color:#e63946">Yogonet</div>
+          
+            <div class="headline-item">
+              <div class="headline-title">
+                <a href="https://www.yogonet.com/international/news/2026/05/18/120941-regulating-the-game-introduces-fourtier-partnership-model-for-2027-sydney-event" target="_blank" rel="noopener">Regulating the Game introduces four-tier partnership model for 2027 Sydney event</a>
+              </div>
+              <div class="headline-snippet">Regulating the Game has announced a new four-tier partnership structure for its 2027 Sydney program, aimed at giving sponsors clearer alignment with the conference and awards gala.…</div>
+            </div>
+            <div class="headline-item">
+              <div class="headline-title">
+                <a href="https://www.yogonet.com/international/news/2026/05/19/121054-global-unregulated-online-gambling-hit-59-trillion-in-2025-according-to-new-report" target="_blank" rel="noopener">Global unregulated online gambling hit $5.9 trillion in 2025, according to new report</a>
+              </div>
+              <div class="headline-snippet">Global unregulated online gambling wagering volume reached $5.9 trillion in 2025, with illegal operators accounting for an estimated 78% of worldwide online gaming gross gaming rev…</div>
+            </div>
+            <div class="headline-item">
+              <div class="headline-title">
+                <a href="https://www.yogonet.com/international/news/2026/05/19/121042-sporttrade-to-exit-us-online-sports-betting-markets-while-awaiting-cftc-decision" target="_blank" rel="noopener">Sporttrade to exit US online sports betting markets while awaiting CFTC decision</a>
+              </div>
+              <div class="headline-snippet">Sports trading marketplace Sporttrade will exit the US online sports betting market, ending operations across its licensed states by June 26, 2026. The platform will close for busi…</div>
+            </div>
+            <div class="headline-item">
+              <div class="headline-title">
+                <a href="https://www.yogonet.com/international/news/2026/05/19/120931-why-game-providers-are-partnering-with-anjouanlicensed-operators" target="_blank" rel="noopener">Why game providers are partnering with Anjouan-licensed operators</a>
+              </div>
+              <div class="headline-snippet">In this article, iGaming industry consultant Ron Mendelson, Fast Offshore, examines how Anjouan has evolved into one of the industry’s fastest-growing licensing jurisdictions and w…</div>
+            </div>
+            <div class="headline-item">
+              <div class="headline-title">
+                <a href="https://www.yogonet.com/international/news/2026/05/19/120640-casinocanada-launches-bgamingpowered-social-slot-tournament-platform" target="_blank" rel="noopener">CasinoCanada launches BGaming-powered social slot tournament platform</a>
+              </div>
+              <div class="headline-snippet">CasinoCanada has introduced a social tournament system centered on free-to-enter slot competitions, featuring daily, weekly, and monthly events with leaderboards, bonus rewards, an…</div>
+            </div>
+        </div>
+        <div class="source-block">
+          <div class="source-label" style="border-left-color:#79c0ff; color:#79c0ff">CDC Gaming</div>
+          
+            <div class="headline-item">
+              <div class="headline-title">
+                <a href="https://cdcgaming.com/mohegan-digital-sets-record-for-first-quarter-performance/" target="_blank" rel="noopener">Mohegan second-quarter profit boosted by record digital performance</a>
+              </div>
+              <div class="headline-snippet">Despite a deal to sell the Connecticut Sun WNBA team for $300 million and record quarterly net revenues, profits at Mohegan Tribal Gaming Authority tightened considerably. The seco…</div>
+            </div>
+            <div class="headline-item">
+              <div class="headline-title">
+                <a href="https://cdcgaming.com/upcoming-unlv-gambling-conference-adds-speakers-and-sessions/" target="_blank" rel="noopener">Upcoming UNLV gambling conference adds speakers and sessions</a>
+              </div>
+              <div class="headline-snippet">The 19th International Conference on Gambling &#38; Risk Taking will take place May 26-28 at Bellagio Resort &#38; Casino in Las Vegas. Keynote and panel presentations will span sp…</div>
+            </div>
+            <div class="headline-item">
+              <div class="headline-title">
+                <a href="https://cdcgaming.com/aristocrat-gaming-releases-crown-bartop-hardware/" target="_blank" rel="noopener">Aristocrat Gaming releases Crown Bartop hardware</a>
+              </div>
+              <div class="headline-snippet">Aristocrat Gaming recently released the Class 2 Crown Bartop hardware. The hardware features two titles from The Hunt game family &#8211; players can enjoy legacy Red Screen Free S…</div>
+            </div>
+            <div class="headline-item">
+              <div class="headline-title">
+                <a href="https://cdcgaming.com/wall-street-bets-caesars-gambling-com-monarch-casino-resorts-brightstar-lottery/" target="_blank" rel="noopener">Wall Street Bets: Caesars, Gambling.com, Monarch Casino Resorts, Brightstar Lottery</a>
+              </div>
+              <div class="headline-snippet">Dan Politzer of J.P. Morgan looked at Caesars prospects on May 15: “We continue to think a potential Caesars takeout in the low/mid-$30s range is rational and achievable. With furt…</div>
+            </div>
+            <div class="headline-item">
+              <div class="headline-title">
+                <a href="https://cdcgaming.com/casino-operator-jacobs-entertainment-celebrates-400m-completion-in-downtown-reno/" target="_blank" rel="noopener">Casino operator Jacobs Entertainment celebrates $400M completion in downtown Reno</a>
+              </div>
+              <div class="headline-snippet">Jacobs Entertainment officials were joined Monday by local dignitaries and community leaders to celebrate the completion of J Resort&#8217;s $400 million, five-year phase one of de…</div>
+            </div>
+        </div>
+        <div class="source-block">
+          <div class="source-label" style="border-left-color:#56d364; color:#56d364">American Gaming Assoc</div>
+          
+            <div class="headline-item">
+              <div class="headline-title">
+                <a href="https://www.americangaming.org/gaming-executives-remain-optimistic-as-industry-growth-continues-sports-event-contracts-drive-rising-industry-concern/" target="_blank" rel="noopener">Gaming Executives Remain Optimistic as Industry Growth Continues; Sports Event Contracts Drive Rising Industry Concern</a>
+              </div>
+              
+            </div>
+        </div></div>
+      <p class="sources-note">Sources checked: 2026-05-19 15:20 UTC</p>
+    </div>
+  </div>
+
+  <!-- Section 2: State Matrix -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <div class="section-title">State-by-State Regulatory &amp; Revenue Matrix</div>
+      <div class="section-meta">Revenue as of 2026-04</div>
+    </div>
+    <div class="section-body">
+      <div class="search-wrap">
+        <input class="search-input" type="text" id="stateSearch" placeholder="Filter states…" oninput="filterStates(this.value)">
+      </div>
+      <div class="table-wrap">
+        <table class="data-table" id="stateTable">
+          <thead>
+            <tr>
+              <th>State</th>
+              <th>OSB</th>
+              <th>iGaming</th>
+              <th>Pred. Mkts</th>
+              <th class="num">OSB GGR</th>
+              <th class="num">YoY</th>
+              <th class="num">iGaming GGR</th>
+              <th class="num">YoY</th>
+              <th class="num">Tax OSB</th>
+              <th class="num">Tax iG</th>
+              <th class="num">Period</th>
+            </tr>
+          </thead>
+          <tbody id="stateBody">
+            
+        <tr class="">
+          <td class="state-cell">
+            <span class="state-code">AL</span>
+            <span class="state-name">Alabama</span>
+            
+          </td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">—</td>
+          <td class="num">—</td>
+          <td class="num muted">—</td>
+        </tr>
+        <tr class="">
+          <td class="state-cell">
+            <span class="state-code">AK</span>
+            <span class="state-name">Alaska</span>
+            
+          </td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">—</td>
+          <td class="num">—</td>
+          <td class="num muted">—</td>
+        </tr>
+        <tr class="amelco-row">
+          <td class="state-cell">
+            <span class="state-code">AZ</span>
+            <span class="state-name">Arizona</span>
+            <span class='amelco-badge'>★ Amelco</span>
+          </td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="badge badge-live">✓</span></td>
+          <td class="num">$622.8M</td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">8%</td>
+          <td class="num">—</td>
+          <td class="num muted">2026-04</td>
+        </tr>
+        <tr class="">
+          <td class="state-cell">
+            <span class="state-code">AR</span>
+            <span class="state-name">Arkansas</span>
+            
+          </td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="na">—</span></td>
+          <td class="num">$114.6M</td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">13%</td>
+          <td class="num">—</td>
+          <td class="num muted">2026-04</td>
+        </tr>
+        <tr class="">
+          <td class="state-cell">
+            <span class="state-code">CA</span>
+            <span class="state-name">California</span>
+            
+          </td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">—</td>
+          <td class="num">—</td>
+          <td class="num muted">—</td>
+        </tr>
+        <tr class="amelco-row">
+          <td class="state-cell">
+            <span class="state-code">CO</span>
+            <span class="state-name">Colorado</span>
+            <span class='amelco-badge'>★ Amelco</span>
+          </td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="badge badge-live">✓</span></td>
+          <td class="num">$580.3M</td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">10%</td>
+          <td class="num">—</td>
+          <td class="num muted">2026-04</td>
+        </tr>
+        <tr class="amelco-row">
+          <td class="state-cell">
+            <span class="state-code">CT</span>
+            <span class="state-name">Connecticut</span>
+            <span class='amelco-badge'>★ Amelco</span>
+          </td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="na">—</span></td>
+          <td class="num">$198.5M</td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">14%</td>
+          <td class="num">18%</td>
+          <td class="num muted">2026-04</td>
+        </tr>
+        <tr class="">
+          <td class="state-cell">
+            <span class="state-code">DC</span>
+            <span class="state-name">Washington D.C.</span>
+            
+          </td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="na">—</span></td>
+          <td class="num">$94.7M</td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">10%</td>
+          <td class="num">—</td>
+          <td class="num muted">2026-04</td>
+        </tr>
+        <tr class="">
+          <td class="state-cell">
+            <span class="state-code">DE</span>
+            <span class="state-name">Delaware</span>
+            
+          </td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="na">—</span></td>
+          <td class="num">$20.7M</td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">50%</td>
+          <td class="num">15%</td>
+          <td class="num muted">2026-04</td>
+        </tr>
+        <tr class="">
+          <td class="state-cell">
+            <span class="state-code">FL</span>
+            <span class="state-name">Florida</span>
+            
+          </td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">10%</td>
+          <td class="num">—</td>
+          <td class="num muted">—</td>
+        </tr>
+        <tr class="">
+          <td class="state-cell">
+            <span class="state-code">GA</span>
+            <span class="state-name">Georgia</span>
+            
+          </td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">—</td>
+          <td class="num">—</td>
+          <td class="num muted">—</td>
+        </tr>
+        <tr class="">
+          <td class="state-cell">
+            <span class="state-code">HI</span>
+            <span class="state-name">Hawaii</span>
+            
+          </td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">—</td>
+          <td class="num">—</td>
+          <td class="num muted">—</td>
+        </tr>
+        <tr class="">
+          <td class="state-cell">
+            <span class="state-code">ID</span>
+            <span class="state-name">Idaho</span>
+            
+          </td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">—</td>
+          <td class="num">—</td>
+          <td class="num muted">—</td>
+        </tr>
+        <tr class="amelco-row">
+          <td class="state-cell">
+            <span class="state-code">IL</span>
+            <span class="state-name">Illinois</span>
+            <span class='amelco-badge'>★ Amelco</span>
+          </td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="badge badge-live">✓</span></td>
+          <td class="num">$2255.9M</td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">15%</td>
+          <td class="num">—</td>
+          <td class="num muted">2026-04</td>
+        </tr>
+        <tr class="amelco-row">
+          <td class="state-cell">
+            <span class="state-code">IN</span>
+            <span class="state-name">Indiana</span>
+            <span class='amelco-badge'>★ Amelco</span>
+          </td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="badge badge-live">✓</span></td>
+          <td class="num">$567.5M</td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">10%</td>
+          <td class="num">—</td>
+          <td class="num muted">2026-04</td>
+        </tr>
+        <tr class="">
+          <td class="state-cell">
+            <span class="state-code">IA</span>
+            <span class="state-name">Iowa</span>
+            
+          </td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="na">—</span></td>
+          <td class="num">$274.5M</td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">6%</td>
+          <td class="num">—</td>
+          <td class="num muted">2026-04</td>
+        </tr>
+        <tr class="amelco-row">
+          <td class="state-cell">
+            <span class="state-code">KS</span>
+            <span class="state-name">Kansas</span>
+            <span class='amelco-badge'>★ Amelco</span>
+          </td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="na">—</span></td>
+          <td class="num">$193.6M</td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">10%</td>
+          <td class="num">—</td>
+          <td class="num muted">2026-04</td>
+        </tr>
+        <tr class="amelco-row">
+          <td class="state-cell">
+            <span class="state-code">KY</span>
+            <span class="state-name">Kentucky</span>
+            <span class='amelco-badge'>★ Amelco</span>
+          </td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="na">—</span></td>
+          <td class="num">$305.4M</td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">10%</td>
+          <td class="num">—</td>
+          <td class="num muted">2026-04</td>
+        </tr>
+        <tr class="amelco-row">
+          <td class="state-cell">
+            <span class="state-code">LA</span>
+            <span class="state-name">Louisiana</span>
+            <span class='amelco-badge'>★ Amelco</span>
+          </td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="na">—</span></td>
+          <td class="num">$516.7M</td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">15%</td>
+          <td class="num">—</td>
+          <td class="num muted">2026-04</td>
+        </tr>
+        <tr class="">
+          <td class="state-cell">
+            <span class="state-code">ME</span>
+            <span class="state-name">Maine</span>
+            
+          </td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="na">—</span></td>
+          <td class="num">$66.8M</td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">16%</td>
+          <td class="num">16%</td>
+          <td class="num muted">2026-04</td>
+        </tr>
+        <tr class="amelco-row">
+          <td class="state-cell">
+            <span class="state-code">MD</span>
+            <span class="state-name">Maryland</span>
+            <span class='amelco-badge'>★ Amelco</span>
+          </td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="badge badge-live">✓</span></td>
+          <td class="num">$962.7M</td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">15%</td>
+          <td class="num">—</td>
+          <td class="num muted">2026-04</td>
+        </tr>
+        <tr class="">
+          <td class="state-cell">
+            <span class="state-code">MA</span>
+            <span class="state-name">Massachusetts</span>
+            
+          </td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="na">—</span></td>
+          <td class="num">$843.2M</td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">15%</td>
+          <td class="num">—</td>
+          <td class="num muted">2026-04</td>
+        </tr>
+        <tr class="amelco-row">
+          <td class="state-cell">
+            <span class="state-code">MI</span>
+            <span class="state-name">Michigan</span>
+            <span class='amelco-badge'>★ Amelco</span>
+          </td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="badge badge-live">✓</span></td>
+          <td class="num">$529.6M</td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">8%</td>
+          <td class="num">20%</td>
+          <td class="num muted">2026-04</td>
+        </tr>
+        <tr class="">
+          <td class="state-cell">
+            <span class="state-code">MN</span>
+            <span class="state-name">Minnesota</span>
+            
+          </td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">—</td>
+          <td class="num">—</td>
+          <td class="num muted">—</td>
+        </tr>
+        <tr class="">
+          <td class="state-cell">
+            <span class="state-code">MS</span>
+            <span class="state-name">Mississippi</span>
+            
+          </td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="na">—</span></td>
+          <td class="num">$49.8M</td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">12%</td>
+          <td class="num">—</td>
+          <td class="num muted">2026-04</td>
+        </tr>
+        <tr class="">
+          <td class="state-cell">
+            <span class="state-code">MO</span>
+            <span class="state-name">Missouri</span>
+            
+          </td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="na">—</span></td>
+          <td class="num">$20.8M</td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">10%</td>
+          <td class="num">—</td>
+          <td class="num muted">2026-04</td>
+        </tr>
+        <tr class="">
+          <td class="state-cell">
+            <span class="state-code">MT</span>
+            <span class="state-name">Montana</span>
+            
+          </td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="na">—</span></td>
+          <td class="num">$10.2M</td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">8%</td>
+          <td class="num">—</td>
+          <td class="num muted">2026-04</td>
+        </tr>
+        <tr class="">
+          <td class="state-cell">
+            <span class="state-code">NE</span>
+            <span class="state-name">Nebraska</span>
+            
+          </td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="na">—</span></td>
+          <td class="num">$9.3M</td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">20%</td>
+          <td class="num">—</td>
+          <td class="num muted">2026-04</td>
+        </tr>
+        <tr class="">
+          <td class="state-cell">
+            <span class="state-code">NV</span>
+            <span class="state-name">Nevada</span>
+            
+          </td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="badge badge-live">✓</span></td>
+          <td class="num">$3150.6M</td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">6%</td>
+          <td class="num">—</td>
+          <td class="num muted">2026-04</td>
+        </tr>
+        <tr class="">
+          <td class="state-cell">
+            <span class="state-code">NH</span>
+            <span class="state-name">New Hampshire</span>
+            
+          </td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="na">—</span></td>
+          <td class="num">$103.6M</td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">51%</td>
+          <td class="num">—</td>
+          <td class="num muted">2026-04</td>
+        </tr>
+        <tr class="amelco-row">
+          <td class="state-cell">
+            <span class="state-code">NJ</span>
+            <span class="state-name">New Jersey</span>
+            <span class='amelco-badge'>★ Amelco</span>
+          </td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="badge badge-live">✓</span></td>
+          <td class="num">$1177.2M</td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">8%</td>
+          <td class="num">15%</td>
+          <td class="num muted">2026-04</td>
+        </tr>
+        <tr class="">
+          <td class="state-cell">
+            <span class="state-code">NM</span>
+            <span class="state-name">New Mexico</span>
+            
+          </td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">—</td>
+          <td class="num">—</td>
+          <td class="num muted">—</td>
+        </tr>
+        <tr class="amelco-row">
+          <td class="state-cell">
+            <span class="state-code">NY</span>
+            <span class="state-name">New York</span>
+            <span class='amelco-badge'>★ Amelco</span>
+          </td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="badge badge-live">✓</span></td>
+          <td class="num">$2549.0M</td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">51%</td>
+          <td class="num">—</td>
+          <td class="num muted">2026-04</td>
+        </tr>
+        <tr class="">
+          <td class="state-cell">
+            <span class="state-code">NC</span>
+            <span class="state-name">North Carolina</span>
+            
+          </td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="na">—</span></td>
+          <td class="num">$737.7M</td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">18%</td>
+          <td class="num">—</td>
+          <td class="num muted">2026-04</td>
+        </tr>
+        <tr class="">
+          <td class="state-cell">
+            <span class="state-code">ND</span>
+            <span class="state-name">North Dakota</span>
+            
+          </td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">6%</td>
+          <td class="num">—</td>
+          <td class="num muted">—</td>
+        </tr>
+        <tr class="amelco-row">
+          <td class="state-cell">
+            <span class="state-code">OH</span>
+            <span class="state-name">Ohio</span>
+            <span class='amelco-badge'>★ Amelco</span>
+          </td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="badge badge-live">✓</span></td>
+          <td class="num">$1044.4M</td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">20%</td>
+          <td class="num">—</td>
+          <td class="num muted">2026-04</td>
+        </tr>
+        <tr class="">
+          <td class="state-cell">
+            <span class="state-code">OK</span>
+            <span class="state-name">Oklahoma</span>
+            
+          </td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">—</td>
+          <td class="num">—</td>
+          <td class="num muted">—</td>
+        </tr>
+        <tr class="">
+          <td class="state-cell">
+            <span class="state-code">OR</span>
+            <span class="state-name">Oregon</span>
+            
+          </td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="na">—</span></td>
+          <td class="num">$101.3M</td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">—</td>
+          <td class="num">—</td>
+          <td class="num muted">2026-04</td>
+        </tr>
+        <tr class="amelco-row">
+          <td class="state-cell">
+            <span class="state-code">PA</span>
+            <span class="state-name">Pennsylvania</span>
+            <span class='amelco-badge'>★ Amelco</span>
+          </td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="badge badge-live">✓</span></td>
+          <td class="num">$762.4M</td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">36%</td>
+          <td class="num">54%</td>
+          <td class="num muted">2026-04</td>
+        </tr>
+        <tr class="">
+          <td class="state-cell">
+            <span class="state-code">RI</span>
+            <span class="state-name">Rhode Island</span>
+            
+          </td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="na">—</span></td>
+          <td class="num">$40.8M</td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">51%</td>
+          <td class="num">30%</td>
+          <td class="num muted">2026-04</td>
+        </tr>
+        <tr class="">
+          <td class="state-cell">
+            <span class="state-code">SC</span>
+            <span class="state-name">South Carolina</span>
+            
+          </td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">—</td>
+          <td class="num">—</td>
+          <td class="num muted">—</td>
+        </tr>
+        <tr class="">
+          <td class="state-cell">
+            <span class="state-code">SD</span>
+            <span class="state-name">South Dakota</span>
+            
+          </td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="na">—</span></td>
+          <td class="num">$1.1M</td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">9%</td>
+          <td class="num">—</td>
+          <td class="num muted">2026-04</td>
+        </tr>
+        <tr class="amelco-row">
+          <td class="state-cell">
+            <span class="state-code">TN</span>
+            <span class="state-name">Tennessee</span>
+            <span class='amelco-badge'>★ Amelco</span>
+          </td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="na">—</span></td>
+          <td class="num">$538.0M</td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">20%</td>
+          <td class="num">—</td>
+          <td class="num muted">2026-04</td>
+        </tr>
+        <tr class="">
+          <td class="state-cell">
+            <span class="state-code">TX</span>
+            <span class="state-name">Texas</span>
+            
+          </td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">—</td>
+          <td class="num">—</td>
+          <td class="num muted">—</td>
+        </tr>
+        <tr class="">
+          <td class="state-cell">
+            <span class="state-code">UT</span>
+            <span class="state-name">Utah</span>
+            
+          </td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">—</td>
+          <td class="num">—</td>
+          <td class="num muted">—</td>
+        </tr>
+        <tr class="amelco-row">
+          <td class="state-cell">
+            <span class="state-code">VA</span>
+            <span class="state-name">Virginia</span>
+            <span class='amelco-badge'>★ Amelco</span>
+          </td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="badge badge-live">✓</span></td>
+          <td class="num">$787.3M</td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">15%</td>
+          <td class="num">—</td>
+          <td class="num muted">2026-04</td>
+        </tr>
+        <tr class="">
+          <td class="state-cell">
+            <span class="state-code">VT</span>
+            <span class="state-name">Vermont</span>
+            
+          </td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="na">—</span></td>
+          <td class="num">$22.8M</td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">20%</td>
+          <td class="num">—</td>
+          <td class="num muted">2026-04</td>
+        </tr>
+        <tr class="">
+          <td class="state-cell">
+            <span class="state-code">WA</span>
+            <span class="state-name">Washington</span>
+            
+          </td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">—</td>
+          <td class="num">—</td>
+          <td class="num muted">—</td>
+        </tr>
+        <tr class="amelco-row">
+          <td class="state-cell">
+            <span class="state-code">WV</span>
+            <span class="state-name">West Virginia</span>
+            <span class='amelco-badge'>★ Amelco</span>
+          </td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="na">—</span></td>
+          <td class="num">$73.9M</td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">10%</td>
+          <td class="num">15%</td>
+          <td class="num muted">2026-04</td>
+        </tr>
+        <tr class="">
+          <td class="state-cell">
+            <span class="state-code">WI</span>
+            <span class="state-name">Wisconsin</span>
+            
+          </td>
+          <td><span class="badge badge-pending">Legal</span></td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">—</td>
+          <td class="num">—</td>
+          <td class="num muted">—</td>
+        </tr>
+        <tr class="">
+          <td class="state-cell">
+            <span class="state-code">WY</span>
+            <span class="state-name">Wyoming</span>
+            
+          </td>
+          <td><span class="badge badge-live">Live</span></td>
+          <td><span class="badge badge-no">—</span></td>
+          <td><span class="na">—</span></td>
+          <td class="num">$26.4M</td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num"><span class="na">—</span></td>
+          <td class="num">10%</td>
+          <td class="num">—</td>
+          <td class="num muted">2026-04</td>
+        </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="table-note">
+        ★ Amelco operates · Revenue data as of <strong>2026-04</strong> ·
+        Status last updated <strong>2026-04-21</strong> ·
+        <span style="color:var(--green)">▲</span> YoY &gt;25% ·
+        <span style="color:var(--red)">▼</span> YoY &lt;-10%
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 3: Legislation -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <div class="section-title">Legislative Tracker</div>
+      <div class="section-meta">0 bill(s) updated this run</div>
+    </div>
+    <div class="section-body">
+      
+        <div class="bill-group">
+          <h4 class="bill-tier-label tag-high">🔴 High Relevance</h4>
+          <div class="table-wrap">
+            <table class="data-table leg-table">
+              <thead><tr>
+                <th>State</th><th>Bill</th><th>Category</th>
+                <th>Summary</th><th>Status</th><th>Last Action</th>
+              </tr></thead>
+              <tbody>
+            <tr>
+              <td><span class="state-code">AL</span> Alabama</td>
+              <td><code>SB 257</code></td>
+              <td><span class="cat-tag">Sports Betting</span></td>
+              <td class="summary-cell">Gaming legislation in Alabama (SB 257)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-04-28</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">CT</span> Connecticut</td>
+              <td><code>HB 5551</code></td>
+              <td><span class="cat-tag">Sports Betting</span></td>
+              <td class="summary-cell">Gaming legislation in Connecticut (HB 5551)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-05-01</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">GA</span> Georgia</td>
+              <td><code>SR 131</code></td>
+              <td><span class="cat-tag">Sports Betting</span></td>
+              <td class="summary-cell">Gaming legislation in Georgia (SR 131)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-04-21</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">GA</span> Georgia</td>
+              <td><code>SB 3303</code></td>
+              <td><span class="cat-tag">Sports Betting</span></td>
+              <td class="summary-cell">Gaming legislation in Georgia (SB 3303)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-04-21</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">HI</span> Hawaii</td>
+              <td><code>HB 2198</code></td>
+              <td><span class="cat-tag">Sports Betting</span></td>
+              <td class="summary-cell">Gaming legislation in Hawaii (HB 2198)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-04-21</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">HI</span> Hawaii</td>
+              <td><code>HB 145</code></td>
+              <td><span class="cat-tag">Sweepstakes Ban</span></td>
+              <td class="summary-cell">Gaming legislation in Hawaii (HB 145)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-04-21</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">HI</span> Hawaii</td>
+              <td><code>SB 257</code></td>
+              <td><span class="cat-tag">Sports Betting</span></td>
+              <td class="summary-cell">Gaming legislation in Hawaii (SB 257)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-04-21</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">IL</span> Illinois</td>
+              <td><code>HB 1167</code></td>
+              <td><span class="cat-tag">Sports Betting</span></td>
+              <td class="summary-cell">Gaming legislation in Illinois (HB 1167)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-04-21</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">IN</span> Indiana</td>
+              <td><code>SB 120</code></td>
+              <td><span class="cat-tag">Sports Betting</span></td>
+              <td class="summary-cell">Gaming legislation in Indiana (SB 120)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-05-01</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">LA</span> Louisiana</td>
+              <td><code>HB 53</code></td>
+              <td><span class="cat-tag">Sports Betting</span></td>
+              <td class="summary-cell">Gaming legislation in Louisiana (HB 53)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-05-01</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">ME</span> Maine</td>
+              <td><code>HB 53</code></td>
+              <td><span class="cat-tag">Sports Betting</span></td>
+              <td class="summary-cell">Gaming legislation in Maine (HB 53)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-04-21</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">MS</span> Mississippi</td>
+              <td><code>HB 4074</code></td>
+              <td><span class="cat-tag">Sports Betting</span></td>
+              <td class="summary-cell">Gaming legislation in Mississippi (HB 4074)</td>
+              <td><span class="pill pill-passed1">Passed One Chamber</span></td>
+              <td class="muted">2026-04-21</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">MS</span> Mississippi</td>
+              <td><code>HB 1581</code></td>
+              <td><span class="cat-tag">Sports Betting</span></td>
+              <td class="summary-cell">Gaming legislation in Mississippi (HB 1581)</td>
+              <td><span class="pill pill-passed1">Passed One Chamber</span></td>
+              <td class="muted">2026-04-21</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">OH</span> Ohio</td>
+              <td><code>SB 199</code></td>
+              <td><span class="cat-tag">Sports Betting</span></td>
+              <td class="summary-cell">Gaming legislation in Ohio (SB 199)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-05-19</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">OK</span> Oklahoma</td>
+              <td><code>HB 1047</code></td>
+              <td><span class="cat-tag">Sports Betting</span></td>
+              <td class="summary-cell">Gaming legislation in Oklahoma (HB 1047)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-04-21</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">OK</span> Oklahoma</td>
+              <td><code>HB 1101</code></td>
+              <td><span class="cat-tag">Sports Betting</span></td>
+              <td class="summary-cell">Gaming legislation in Oklahoma (HB 1101)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-04-21</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">VA</span> Virginia</td>
+              <td><code>HB 161</code></td>
+              <td><span class="cat-tag">iGaming</span></td>
+              <td class="summary-cell">Gaming legislation in Virginia (HB 161)</td>
+              <td><span class="pill pill-signed">Signed</span></td>
+              <td class="muted">2026-04-21</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">VA</span> Virginia</td>
+              <td><code>SB 195</code></td>
+              <td><span class="cat-tag">Sports Betting</span></td>
+              <td class="summary-cell">Gaming legislation in Virginia (SB 195)</td>
+              <td><span class="pill pill-incommittee">In Committee</span></td>
+              <td class="muted">2026-05-01</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">WA</span> Washington</td>
+              <td><code>SB 6137</code></td>
+              <td><span class="cat-tag">Sports Betting</span></td>
+              <td class="summary-cell">Gaming legislation in Washington (SB 6137)</td>
+              <td><span class="pill pill-passed1">Passed One Chamber</span></td>
+              <td class="muted">2026-04-21</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">WI</span> Wisconsin</td>
+              <td><code>HB 145</code></td>
+              <td><span class="cat-tag">Sports Betting</span></td>
+              <td class="summary-cell">Gaming legislation in Wisconsin (HB 145)</td>
+              <td><span class="pill pill-incommittee">In Committee</span></td>
+              <td class="muted">2026-04-28</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">WI</span> Wisconsin</td>
+              <td><code>SB 195</code></td>
+              <td><span class="cat-tag">Sports Betting</span></td>
+              <td class="summary-cell">Gaming legislation in Wisconsin (SB 195)</td>
+              <td><span class="pill pill-incommittee">In Committee</span></td>
+              <td class="muted">2026-04-21</td>
+            </tr></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="bill-group">
+          <h4 class="bill-tier-label tag-med">🟡 Medium Relevance</h4>
+          <div class="table-wrap">
+            <table class="data-table leg-table">
+              <thead><tr>
+                <th>State</th><th>Bill</th><th>Category</th>
+                <th>Summary</th><th>Status</th><th>Last Action</th>
+              </tr></thead>
+              <tbody>
+            <tr>
+              <td><span class="state-code">AK</span> Alaska</td>
+              <td><code>SB 257</code></td>
+              <td><span class="cat-tag">Sports Betting</span></td>
+              <td class="summary-cell">Gaming legislation in Alaska (SB 257)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-05-01</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">AK</span> Alaska</td>
+              <td><code>AB 831</code></td>
+              <td><span class="cat-tag">Prediction Markets</span></td>
+              <td class="summary-cell">Gaming legislation in Alaska (AB 831)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-05-01</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">CA</span> California</td>
+              <td><code>AB 831</code></td>
+              <td><span class="cat-tag">Prediction Markets</span></td>
+              <td class="summary-cell">Gaming legislation in California (AB 831)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-04-28</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">CT</span> Connecticut</td>
+              <td><code>HB 6051</code></td>
+              <td><span class="cat-tag">Sports Betting</span></td>
+              <td class="summary-cell">Gaming legislation in Connecticut (HB 6051)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-05-01</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">CT</span> Connecticut</td>
+              <td><code>SB 204</code></td>
+              <td><span class="cat-tag">Sweepstakes Ban</span></td>
+              <td class="summary-cell">Gaming legislation in Connecticut (SB 204)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-04-21</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">FL</span> Florida</td>
+              <td><code>HB 5551</code></td>
+              <td><span class="cat-tag">Sports Betting</span></td>
+              <td class="summary-cell">Gaming legislation in Florida (HB 5551)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-04-28</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">FL</span> Florida</td>
+              <td><code>SB 530</code></td>
+              <td><span class="cat-tag">Other</span></td>
+              <td class="summary-cell">Gaming legislation in Florida (SB 530)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-04-28</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">FL</span> Florida</td>
+              <td><code>SB 204</code></td>
+              <td><span class="cat-tag">Sweepstakes Ban</span></td>
+              <td class="summary-cell">Gaming legislation in Florida (SB 204)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-04-28</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">FL</span> Florida</td>
+              <td><code>SB 195</code></td>
+              <td><span class="cat-tag">Sports Betting</span></td>
+              <td class="summary-cell">Gaming legislation in Florida (SB 195)</td>
+              <td><span class="pill pill-incommittee">In Committee</span></td>
+              <td class="muted">2026-05-19</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">GA</span> Georgia</td>
+              <td><code>HB 910</code></td>
+              <td><span class="cat-tag">Sports Betting</span></td>
+              <td class="summary-cell">Gaming legislation in Georgia (HB 910)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-05-01</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">HI</span> Hawaii</td>
+              <td><code>SR 131</code></td>
+              <td><span class="cat-tag">Sports Betting</span></td>
+              <td class="summary-cell">Gaming legislation in Hawaii (SR 131)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-05-01</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">HI</span> Hawaii</td>
+              <td><code>SB 3303</code></td>
+              <td><span class="cat-tag">Sports Betting</span></td>
+              <td class="summary-cell">Gaming legislation in Hawaii (SB 3303)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-05-19</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">HI</span> Hawaii</td>
+              <td><code>HB 2222</code></td>
+              <td><span class="cat-tag">Prediction Markets</span></td>
+              <td class="summary-cell">Gaming legislation in Hawaii (HB 2222)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-05-01</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">HI</span> Hawaii</td>
+              <td><code>SB 893</code></td>
+              <td><span class="cat-tag">Other</span></td>
+              <td class="summary-cell">Gaming legislation in Hawaii (SB 893)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-05-01</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">HI</span> Hawaii</td>
+              <td><code>HB 1434</code></td>
+              <td><span class="cat-tag">Other</span></td>
+              <td class="summary-cell">Gaming legislation in Hawaii (HB 1434)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-05-01</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">HI</span> Hawaii</td>
+              <td><code>HB 2570</code></td>
+              <td><span class="cat-tag">Sports Betting</span></td>
+              <td class="summary-cell">Gaming legislation in Hawaii (HB 2570)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-05-19</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">IL</span> Illinois</td>
+              <td><code>SB 1963</code></td>
+              <td><span class="cat-tag">iGaming</span></td>
+              <td class="summary-cell">Gaming legislation in Illinois (SB 1963)</td>
+              <td><span class="pill pill-dead">Dead/Tabled</span></td>
+              <td class="muted">2026-05-01</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">IL</span> Illinois</td>
+              <td><code>HB 3080</code></td>
+              <td><span class="cat-tag">iGaming</span></td>
+              <td class="summary-cell">Gaming legislation in Illinois (HB 3080)</td>
+              <td><span class="pill pill-dead">Dead/Tabled</span></td>
+              <td class="muted">2026-05-01</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">IL</span> Illinois</td>
+              <td><code>HB 1052</code></td>
+              <td><span class="cat-tag">Sweepstakes Ban</span></td>
+              <td class="summary-cell">Gaming legislation in Illinois (HB 1052)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-05-01</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">IN</span> Indiana</td>
+              <td><code>HB 1052</code></td>
+              <td><span class="cat-tag">Sports Betting</span></td>
+              <td class="summary-cell">Gaming legislation in Indiana (HB 1052)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-04-21</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">IA</span> Iowa</td>
+              <td><code>SB 2104</code></td>
+              <td><span class="cat-tag">Prediction Markets</span></td>
+              <td class="summary-cell">Gaming legislation in Iowa (SB 2104)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-04-21</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">IA</span> Iowa</td>
+              <td><code>SB 1589</code></td>
+              <td><span class="cat-tag">Prediction Markets</span></td>
+              <td class="summary-cell">Gaming legislation in Iowa (SB 1589)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-04-21</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">IA</span> Iowa</td>
+              <td><code>HB 145</code></td>
+              <td><span class="cat-tag">Sweepstakes Ban</span></td>
+              <td class="summary-cell">Gaming legislation in Iowa (HB 145)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-04-21</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">IA</span> Iowa</td>
+              <td><code>SB 120</code></td>
+              <td><span class="cat-tag">Sports Betting</span></td>
+              <td class="summary-cell">Gaming legislation in Iowa (SB 120)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-04-21</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">IA</span> Iowa</td>
+              <td><code>HB 53</code></td>
+              <td><span class="cat-tag">Sports Betting</span></td>
+              <td class="summary-cell">Gaming legislation in Iowa (HB 53)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-04-21</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">ME</span> Maine</td>
+              <td><code>SB 204</code></td>
+              <td><span class="cat-tag">Sweepstakes Ban</span></td>
+              <td class="summary-cell">Gaming legislation in Maine (SB 204)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-05-01</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">MA</span> Massachusetts</td>
+              <td><code>HB 1052</code></td>
+              <td><span class="cat-tag">Sports Betting</span></td>
+              <td class="summary-cell">Gaming legislation in Massachusetts (HB 1052)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-05-19</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">MI</span> Michigan</td>
+              <td><code>HB 145</code></td>
+              <td><span class="cat-tag">Sweepstakes Ban</span></td>
+              <td class="summary-cell">Gaming legislation in Michigan (HB 145)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-04-21</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">MS</span> Mississippi</td>
+              <td><code>SB 2104</code></td>
+              <td><span class="cat-tag">Prediction Markets</span></td>
+              <td class="summary-cell">Gaming legislation in Mississippi (SB 2104)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-04-21</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">MS</span> Mississippi</td>
+              <td><code>SB 1589</code></td>
+              <td><span class="cat-tag">Prediction Markets</span></td>
+              <td class="summary-cell">Gaming legislation in Mississippi (SB 1589)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-04-21</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">MS</span> Mississippi</td>
+              <td><code>HB 145</code></td>
+              <td><span class="cat-tag">Sweepstakes Ban</span></td>
+              <td class="summary-cell">Gaming legislation in Mississippi (HB 145)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-04-21</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">NE</span> Nebraska</td>
+              <td><code>SB 2104</code></td>
+              <td><span class="cat-tag">Sports Betting</span></td>
+              <td class="summary-cell">Gaming legislation in Nebraska (SB 2104)</td>
+              <td><span class="pill pill-dead">Dead/Tabled</span></td>
+              <td class="muted">2026-05-19</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">NV</span> Nevada</td>
+              <td><code>SB 2104</code></td>
+              <td><span class="cat-tag">Prediction Markets</span></td>
+              <td class="summary-cell">Gaming legislation in Nevada (SB 2104)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-04-21</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">NV</span> Nevada</td>
+              <td><code>SB 1589</code></td>
+              <td><span class="cat-tag">Prediction Markets</span></td>
+              <td class="summary-cell">Gaming legislation in Nevada (SB 1589)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-04-21</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">OK</span> Oklahoma</td>
+              <td><code>SB 2104</code></td>
+              <td><span class="cat-tag">Prediction Markets</span></td>
+              <td class="summary-cell">Gaming legislation in Oklahoma (SB 2104)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-05-01</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">OK</span> Oklahoma</td>
+              <td><code>SB 1589</code></td>
+              <td><span class="cat-tag">Prediction Markets</span></td>
+              <td class="summary-cell">Gaming legislation in Oklahoma (SB 1589)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-05-01</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">RI</span> Rhode Island</td>
+              <td><code>HB 145</code></td>
+              <td><span class="cat-tag">Sweepstakes Ban</span></td>
+              <td class="summary-cell">Gaming legislation in Rhode Island (HB 145)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-04-21</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">VA</span> Virginia</td>
+              <td><code>SB 118</code></td>
+              <td><span class="cat-tag">Sports Betting</span></td>
+              <td class="summary-cell">Gaming legislation in Virginia (SB 118)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-05-19</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">VA</span> Virginia</td>
+              <td><code>HB 145</code></td>
+              <td><span class="cat-tag">Sports Betting</span></td>
+              <td class="summary-cell">Gaming legislation in Virginia (HB 145)</td>
+              <td><span class="pill pill-incommittee">In Committee</span></td>
+              <td class="muted">2026-05-19</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">WV</span> West Virginia</td>
+              <td><code>HB 145</code></td>
+              <td><span class="cat-tag">Sweepstakes Ban</span></td>
+              <td class="summary-cell">Gaming legislation in West Virginia (HB 145)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-05-01</td>
+            </tr></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="bill-group">
+          <h4 class="bill-tier-label tag-low">⚪ Low Relevance</h4>
+          <div class="table-wrap">
+            <table class="data-table leg-table">
+              <thead><tr>
+                <th>State</th><th>Bill</th><th>Category</th>
+                <th>Summary</th><th>Status</th><th>Last Action</th>
+              </tr></thead>
+              <tbody>
+            <tr>
+              <td><span class="state-code">CT</span> Connecticut</td>
+              <td><code>SB 530</code></td>
+              <td><span class="cat-tag">Other</span></td>
+              <td class="summary-cell">Gaming legislation in Connecticut (SB 530)</td>
+              <td><span class="pill pill-intro">Introduced</span></td>
+              <td class="muted">2026-05-01</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">FL</span> Florida</td>
+              <td><code>AB 601</code></td>
+              <td><span class="cat-tag">Sports Betting</span></td>
+              <td class="summary-cell">Gaming legislation in Florida (AB 601)</td>
+              <td><span class="pill pill-signed">Signed</span></td>
+              <td class="muted">2026-04-21</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">FL</span> Florida</td>
+              <td><code>SB 592</code></td>
+              <td><span class="cat-tag">Sports Betting</span></td>
+              <td class="summary-cell">Gaming legislation in Florida (SB 592)</td>
+              <td><span class="pill pill-signed">Signed</span></td>
+              <td class="muted">2026-04-21</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">IL</span> Illinois</td>
+              <td><code>HB 2198</code></td>
+              <td><span class="cat-tag">Prediction Markets</span></td>
+              <td class="summary-cell">Gaming legislation in Illinois (HB 2198)</td>
+              <td><span class="pill pill-dead">Dead/Tabled</span></td>
+              <td class="muted">2026-05-19</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">WI</span> Wisconsin</td>
+              <td><code>AB 601</code></td>
+              <td><span class="cat-tag">Sports Betting</span></td>
+              <td class="summary-cell">Gaming legislation in Wisconsin (AB 601)</td>
+              <td><span class="pill pill-signed">Signed</span></td>
+              <td class="muted">2026-04-21</td>
+            </tr>
+            <tr>
+              <td><span class="state-code">WI</span> Wisconsin</td>
+              <td><code>SB 592</code></td>
+              <td><span class="cat-tag">Sports Betting</span></td>
+              <td class="summary-cell">Gaming legislation in Wisconsin (SB 592)</td>
+              <td><span class="pill pill-signed">Signed</span></td>
+              <td class="muted">2026-04-21</td>
+            </tr></tbody>
+            </table>
+          </div>
+        </div>
+    </div>
+  </div>
+
+  <!-- Section 4: Recommendations -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <div class="section-title">Strategic Recommendations</div>
+      <div class="section-meta">AI-generated · Based on this week's data</div>
+    </div>
+    <div class="section-body">
+      <p class="muted">[AI recommendations unavailable - API error.]
+
+Manual review required. Key high-relevance bills this week:
+
+- **Alabama SB 257** (Sports Betting): Gaming legislation in Alabama (SB 257) [Status: Introduced]
+- **Connecticut HB 5551** (Sports Betting): Gaming legislation in Connecticut (HB 5551) [Status: Introduced]
+- **Georgia SR 131** (Sports Betting): Gaming legislation in Georgia (SR 131) [Status: Introduced]
+- **Georgia SB 3303** (Sports Betting): Gaming legislation in Georgia (SB 3303) [Status: Introduced]
+- **Hawaii HB 2198** (Sports Betting): Gaming legislation in Hawaii (HB 2198) [Status: Introduced]</p>
+    </div>
+  </div>
+
+  <!-- Section 5: Relevant Articles -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <div class="section-title">Relevant Articles</div>
+      <div class="section-meta">Top 5 per source · 27 shown of 66 fetched</div>
+    </div>
+    <div class="section-body">
+      <div class="search-wrap">
+        <input class="search-input" type="text" id="articleSearch"
+               placeholder="Filter articles…" oninput="filterArticles(this.value)">
+      </div>
+      
+    <div class="table-wrap">
+      <table class="data-table art-table">
+        <thead>
+          <tr>
+            <th style="width:180px">Source</th>
+            <th>Story</th>
+          </tr>
+        </thead>
+        <tbody id="articlesBody">
+          
+        <tr>
+          <td class="art-source-cell">
+            <span class="art-source-dot" style="background:#58a6ff"></span>
+            <span class="art-source-name">American Gaming Assoc</span>
+          </td>
+          <td class="art-title-cell">
+            <a href="https://www.americangaming.org/gaming-executives-remain-optimistic-as-industry-growth-continues-sports-event-contracts-drive-rising-industry-concern/" target="_blank" rel="noopener" class="art-link">Gaming Executives Remain Optimistic as Industry Growth Continues; Sports Event Contracts Drive Rising Industry Concern</a>
+            
+          </td>
+        </tr>
+        <tr>
+          <td class="art-source-cell">
+            <span class="art-source-dot" style="background:#3fb950"></span>
+            <span class="art-source-name">CDC Gaming</span>
+          </td>
+          <td class="art-title-cell">
+            <a href="https://cdcgaming.com/aristocrat-gaming-releases-crown-bartop-hardware/" target="_blank" rel="noopener" class="art-link">Aristocrat Gaming releases Crown Bartop hardware</a>
+            <div class="art-snippet">Aristocrat Gaming recently released the Class 2 Crown Bartop hardware. The hardware features two titles from The Hunt game family &#8211; players can enjoy lega…</div>
+          </td>
+        </tr>
+        <tr>
+          <td class="art-source-cell">
+            <span class="art-source-dot" style="background:#3fb950"></span>
+            <span class="art-source-name">CDC Gaming</span>
+          </td>
+          <td class="art-title-cell">
+            <a href="https://cdcgaming.com/casino-operator-jacobs-entertainment-celebrates-400m-completion-in-downtown-reno/" target="_blank" rel="noopener" class="art-link">Casino operator Jacobs Entertainment celebrates $400M completion in downtown Reno</a>
+            <div class="art-snippet">Jacobs Entertainment officials were joined Monday by local dignitaries and community leaders to celebrate the completion of J Resort&#8217;s $400 million, five-…</div>
+          </td>
+        </tr>
+        <tr>
+          <td class="art-source-cell">
+            <span class="art-source-dot" style="background:#3fb950"></span>
+            <span class="art-source-name">CDC Gaming</span>
+          </td>
+          <td class="art-title-cell">
+            <a href="https://cdcgaming.com/mohegan-digital-sets-record-for-first-quarter-performance/" target="_blank" rel="noopener" class="art-link">Mohegan second-quarter profit boosted by record digital performance</a>
+            <div class="art-snippet">Despite a deal to sell the Connecticut Sun WNBA team for $300 million and record quarterly net revenues, profits at Mohegan Tribal Gaming Authority tightened co…</div>
+          </td>
+        </tr>
+        <tr>
+          <td class="art-source-cell">
+            <span class="art-source-dot" style="background:#3fb950"></span>
+            <span class="art-source-name">CDC Gaming</span>
+          </td>
+          <td class="art-title-cell">
+            <a href="https://cdcgaming.com/upcoming-unlv-gambling-conference-adds-speakers-and-sessions/" target="_blank" rel="noopener" class="art-link">Upcoming UNLV gambling conference adds speakers and sessions</a>
+            <div class="art-snippet">The 19th International Conference on Gambling &#38; Risk Taking will take place May 26-28 at Bellagio Resort &#38; Casino in Las Vegas. Keynote and panel presen…</div>
+          </td>
+        </tr>
+        <tr>
+          <td class="art-source-cell">
+            <span class="art-source-dot" style="background:#3fb950"></span>
+            <span class="art-source-name">CDC Gaming</span>
+          </td>
+          <td class="art-title-cell">
+            <a href="https://cdcgaming.com/wall-street-bets-caesars-gambling-com-monarch-casino-resorts-brightstar-lottery/" target="_blank" rel="noopener" class="art-link">Wall Street Bets: Caesars, Gambling.com, Monarch Casino Resorts, Brightstar Lottery</a>
+            <div class="art-snippet">Dan Politzer of J.P. Morgan looked at Caesars prospects on May 15: “We continue to think a potential Caesars takeout in the low/mid-$30s range is rational and a…</div>
+          </td>
+        </tr>
+        <tr>
+          <td class="art-source-cell">
+            <span class="art-source-dot" style="background:#d29922"></span>
+            <span class="art-source-name">Casino.org</span>
+          </td>
+          <td class="art-title-cell">
+            <a href="https://www.casino.org/news/5-9-trillion-illegal-online-gambling-market-is-worlds-third-largest-economy-says-cgi/" target="_blank" rel="noopener" class="art-link">$5.9 Trillion Illegal Online Gambling Market is ‘World’s Third-Largest Economy,’ Says GCI</a>
+            <div class="art-snippet">GCI says unregulated gambling generated $5.9 trillion in global wagering handle Handle measures betting turnover, not actual gambling operator revenue retained …</div>
+          </td>
+        </tr>
+        <tr>
+          <td class="art-source-cell">
+            <span class="art-source-dot" style="background:#d29922"></span>
+            <span class="art-source-name">Casino.org</span>
+          </td>
+          <td class="art-title-cell">
+            <a href="https://www.casino.org/news/congress-pushes-game-act-stop-sports-betting-ads-targeting-kids/" target="_blank" rel="noopener" class="art-link">Congress Pushes GAME Act to Stop Sports Betting Ads From Targeting Kids Online</a>
+            <div class="art-snippet">The GAME Act would make it a federal offense for a major social media platform to allow an advertisement targeting minors with sports betting products or servic…</div>
+          </td>
+        </tr>
+        <tr>
+          <td class="art-source-cell">
+            <span class="art-source-dot" style="background:#d29922"></span>
+            <span class="art-source-name">Casino.org</span>
+          </td>
+          <td class="art-title-cell">
+            <a href="https://www.casino.org/news/jefferies-monarch-casino-sees-attractive-ma-environment/" target="_blank" rel="noopener" class="art-link">Jefferies: Monarch Casino Sees Attractive M&A Environment</a>
+            <div class="art-snippet">Analyst claims M&#38;A could be “most likely avenue” for growth for operator after discussions with management Monarch management sees deep pool of potential op…</div>
+          </td>
+        </tr>
+        <tr>
+          <td class="art-source-cell">
+            <span class="art-source-dot" style="background:#d29922"></span>
+            <span class="art-source-name">Casino.org</span>
+          </td>
+          <td class="art-title-cell">
+            <a href="https://www.casino.org/news/kalshi-joins-the-national-council-on-problem-gambling/" target="_blank" rel="noopener" class="art-link">Kalshi Says It Isn’t a Gambling Platform But Nonetheless Joins the National Council on Problem Gambling</a>
+            <div class="art-snippet">Kalshi and the National Council on Problem Gambling are partnering to promote responsible trading The prediction market maintains that it isn&#8217;t a gambling…</div>
+          </td>
+        </tr>
+        <tr>
+          <td class="art-source-cell">
+            <span class="art-source-dot" style="background:#d29922"></span>
+            <span class="art-source-name">Casino.org</span>
+          </td>
+          <td class="art-title-cell">
+            <a href="https://www.casino.org/news/poker-player-loses-100000-lawsuit-against-hippodrome-casino-ban/" target="_blank" rel="noopener" class="art-link">Poker Player Loses £100,000 Lawsuit Against Hippodrome Casino Ban</a>
+            <div class="art-snippet">Poker player loses £100,000 lawsuit against London’s Hippodrome Casino Casino ban followed complaints about controversial “hit-and-run” poker strategy Judge rej…</div>
+          </td>
+        </tr>
+        <tr>
+          <td class="art-source-cell">
+            <span class="art-source-dot" style="background:#a371f7"></span>
+            <span class="art-source-name">Gambling Insider</span>
+          </td>
+          <td class="art-title-cell">
+            <a href="https://www.gamblinginsider.com/news" target="_blank" rel="noopener" class="art-link">InsideKnowledge.GamblingExpertisesince2010.</a>
+            <div class="art-snippet">A new Wall Street Journal investigation into Polymarket’s dispute-resolution system is expanding scrutiny of the mechanics of market resolution. Over the past y…</div>
+          </td>
+        </tr>
+        <tr>
+          <td class="art-source-cell">
+            <span class="art-source-dot" style="background:#e63946"></span>
+            <span class="art-source-name">Legal Sports Report</span>
+          </td>
+          <td class="art-title-cell">
+            <a href="https://www.legalsportsreport.com/263559/compact-language-key-in-ho-chunk-case-against-kalshi/" target="_blank" rel="noopener" class="art-link">Compact Language Key In Ho-Chunk Case Against Kalshi</a>
+            <div class="art-snippet">Language in the Ho-Chunk Nation&#8216;s tribal compact with the state of Wisconsin was a key factor in a District Court ruling that allows its case against Kals…</div>
+          </td>
+        </tr>
+        <tr>
+          <td class="art-source-cell">
+            <span class="art-source-dot" style="background:#e63946"></span>
+            <span class="art-source-name">Legal Sports Report</span>
+          </td>
+          <td class="art-title-cell">
+            <a href="https://www.legalsportsreport.com/262629/draftkings-presses-prediction-market-advantage-as-fanduel-refines-sportsbook-strategy/" target="_blank" rel="noopener" class="art-link">DraftKings Presses Prediction Market Advantage As FanDuel Refines Sportsbook Strategy</a>
+            <div class="art-snippet">DraftKings used its earnings to show prediction markets are already making money and improving the broader economics of the business. DraftKings reported strong…</div>
+          </td>
+        </tr>
+        <tr>
+          <td class="art-source-cell">
+            <span class="art-source-dot" style="background:#e63946"></span>
+            <span class="art-source-name">Legal Sports Report</span>
+          </td>
+          <td class="art-title-cell">
+            <a href="https://www.legalsportsreport.com/262958/fanduel-needs-to-get-its-mojo-back-flutter-ceo-says/" target="_blank" rel="noopener" class="art-link">FanDuel Needs To ‘Get Its Mojo Back,’ Flutter CEO Says</a>
+            <div class="art-snippet">FanDuel parent Flutter is becoming more explicit about what went wrong in its U.S. sportsbook business. Following the FanDuel leadership shakeup last week, Flut…</div>
+          </td>
+        </tr>
+        <tr>
+          <td class="art-source-cell">
+            <span class="art-source-dot" style="background:#e63946"></span>
+            <span class="art-source-name">Legal Sports Report</span>
+          </td>
+          <td class="art-title-cell">
+            <a href="https://www.legalsportsreport.com/263029/flutter-execs-directors-buy-shares-as-stock-lingers-near-low/" target="_blank" rel="noopener" class="art-link">Flutter Execs, Directors Buy Shares As Stock Lingers Near Low</a>
+            <div class="art-snippet">Seven Flutter insiders including CEO Peter Jackson have bought company stock on the open market as the FanDuel parent hovers near a 52-week low. The stock has b…</div>
+          </td>
+        </tr>
+        <tr>
+          <td class="art-source-cell">
+            <span class="art-source-dot" style="background:#e63946"></span>
+            <span class="art-source-name">Legal Sports Report</span>
+          </td>
+          <td class="art-title-cell">
+            <a href="https://www.legalsportsreport.com/263242/report-ballys-beats-betrivers-parent-for-second-ri-sportsbook-license/" target="_blank" rel="noopener" class="art-link">Report: Bally’s Beats BetRivers Parent For Second RI Sportsbook License</a>
+            <div class="art-snippet">The operator of both casinos in Rhode Island has won a second sports betting license in the state, as Bally&#8217;s beat out Rush Street Interactive&#8216;s Bet…</div>
+          </td>
+        </tr>
+        <tr>
+          <td class="art-source-cell">
+            <span class="art-source-dot" style="background:#79c0ff"></span>
+            <span class="art-source-name">SBC Americas</span>
+          </td>
+          <td class="art-title-cell">
+            <a href="https://sbcamericas.com/2026/05/19/kalshi-first-prediction-market-ncpg/" target="_blank" rel="noopener" class="art-link">Kalshi emerges as first prediction market to secure NCPG membership</a>
+            <div class="art-snippet">Kalshi and the National Council on Problem Gambling (NCPG) have agreed to a landmark deal, making Kalshi the first prediction market to join the non-profit orga…</div>
+          </td>
+        </tr>
+        <tr>
+          <td class="art-source-cell">
+            <span class="art-source-dot" style="background:#79c0ff"></span>
+            <span class="art-source-name">SBC Americas</span>
+          </td>
+          <td class="art-title-cell">
+            <a href="https://sbcamericas.com/2026/05/15/prediction-market-weekly-sbc-nfl-kalshi/" target="_blank" rel="noopener" class="art-link">Prediction Markets Weekly: NFL sends letter to the CFTC, Kalshi teams up with MSG</a>
+            <div class="art-snippet">The burgeoning U.S. prediction market sector closed a busy week of activity. Each Friday at SBC Americas, we highlight some of the biggest headlines and stories…</div>
+          </td>
+        </tr>
+        <tr>
+          <td class="art-source-cell">
+            <span class="art-source-dot" style="background:#79c0ff"></span>
+            <span class="art-source-name">SBC Americas</span>
+          </td>
+          <td class="art-title-cell">
+            <a href="https://sbcamericas.com/2026/05/18/hebert-louisiana-responsible-gaming/" target="_blank" rel="noopener" class="art-link">Q+A: Christopher Hebert on how Louisiana addresses responsible gaming</a>
+            <div class="art-snippet">As chairman of the Louisiana Gaming Control Board, Christopher Hebert deals with the constantly evolving challenges in reaching and helping problem gamblers eve…</div>
+          </td>
+        </tr>
+        <tr>
+          <td class="art-source-cell">
+            <span class="art-source-dot" style="background:#79c0ff"></span>
+            <span class="art-source-name">SBC Americas</span>
+          </td>
+          <td class="art-title-cell">
+            <a href="https://sbcamericas.com/2026/05/15/rhode-island-ballys-sports-betting/" target="_blank" rel="noopener" class="art-link">Rhode Island expands sports betting market with Bally’s license: report</a>
+            <div class="art-snippet">Bally’s Corporation is continuing to solidify its footprint in Rhode Island’s commercial gaming market after being awarded a vendor license to expand its presen…</div>
+          </td>
+        </tr>
+        <tr>
+          <td class="art-source-cell">
+            <span class="art-source-dot" style="background:#79c0ff"></span>
+            <span class="art-source-name">SBC Americas</span>
+          </td>
+          <td class="art-title-cell">
+            <a href="https://sbcamericas.com/2026/05/19/draftkings-cfo-ellingson-chat-takeaways/" target="_blank" rel="noopener" class="art-link">What we learned in DraftKings CFO Alan Ellingson’s fireside chat</a>
+            <div class="art-snippet">Thursday&#8217;s MoffettNathanson fireside chat with DraftKings CFO Alan Ellingson provided a handful of intriguing insights into the planned next evolution of …</div>
+          </td>
+        </tr>
+        <tr>
+          <td class="art-source-cell">
+            <span class="art-source-dot" style="background:#56d364"></span>
+            <span class="art-source-name">Yogonet</span>
+          </td>
+          <td class="art-title-cell">
+            <a href="https://www.yogonet.com/international/news/2026/05/19/120640-casinocanada-launches-bgamingpowered-social-slot-tournament-platform" target="_blank" rel="noopener" class="art-link">CasinoCanada launches BGaming-powered social slot tournament platform</a>
+            <div class="art-snippet">CasinoCanada has introduced a social tournament system centered on free-to-enter slot competitions, featuring daily, weekly, and monthly events with leaderboard…</div>
+          </td>
+        </tr>
+        <tr>
+          <td class="art-source-cell">
+            <span class="art-source-dot" style="background:#56d364"></span>
+            <span class="art-source-name">Yogonet</span>
+          </td>
+          <td class="art-title-cell">
+            <a href="https://www.yogonet.com/international/news/2026/05/19/121054-global-unregulated-online-gambling-hit-59-trillion-in-2025-according-to-new-report" target="_blank" rel="noopener" class="art-link">Global unregulated online gambling hit $5.9 trillion in 2025, according to new report</a>
+            <div class="art-snippet">Global unregulated online gambling wagering volume reached $5.9 trillion in 2025, with illegal operators accounting for an estimated 78% of worldwide online gam…</div>
+          </td>
+        </tr>
+        <tr>
+          <td class="art-source-cell">
+            <span class="art-source-dot" style="background:#56d364"></span>
+            <span class="art-source-name">Yogonet</span>
+          </td>
+          <td class="art-title-cell">
+            <a href="https://www.yogonet.com/international/news/2026/05/18/120941-regulating-the-game-introduces-fourtier-partnership-model-for-2027-sydney-event" target="_blank" rel="noopener" class="art-link">Regulating the Game introduces four-tier partnership model for 2027 Sydney event</a>
+            <div class="art-snippet">Regulating the Game has announced a new four-tier partnership structure for its 2027 Sydney program, aimed at giving sponsors clearer alignment with the confere…</div>
+          </td>
+        </tr>
+        <tr>
+          <td class="art-source-cell">
+            <span class="art-source-dot" style="background:#56d364"></span>
+            <span class="art-source-name">Yogonet</span>
+          </td>
+          <td class="art-title-cell">
+            <a href="https://www.yogonet.com/international/news/2026/05/19/121042-sporttrade-to-exit-us-online-sports-betting-markets-while-awaiting-cftc-decision" target="_blank" rel="noopener" class="art-link">Sporttrade to exit US online sports betting markets while awaiting CFTC decision</a>
+            <div class="art-snippet">Sports trading marketplace Sporttrade will exit the US online sports betting market, ending operations across its licensed states by June 26, 2026. The platform…</div>
+          </td>
+        </tr>
+        <tr>
+          <td class="art-source-cell">
+            <span class="art-source-dot" style="background:#56d364"></span>
+            <span class="art-source-name">Yogonet</span>
+          </td>
+          <td class="art-title-cell">
+            <a href="https://www.yogonet.com/international/news/2026/05/19/120931-why-game-providers-are-partnering-with-anjouanlicensed-operators" target="_blank" rel="noopener" class="art-link">Why game providers are partnering with Anjouan-licensed operators</a>
+            <div class="art-snippet">In this article, iGaming industry consultant Ron Mendelson, Fast Offshore, examines how Anjouan has evolved into one of the industry’s fastest-growing licensing…</div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table-note">
+      27 articles from 7 sources · Past 14 days ·
+      Click any headline to open the full story
+    </div>
+    </div>
+  </div>
+
+</div><!-- /page-wrap -->
+
+<script>
+  function filterStates(q) {
+    q = q.toLowerCase();
+    document.querySelectorAll('#stateBody tr').forEach(row => {
+      row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+  }
+
+  function filterArticles(q) {
+    q = q.toLowerCase();
+    document.querySelectorAll('#articlesBody tr').forEach(row => {
+      row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+  }
+
+  const LOCAL_SERVER = 'http://localhost:8765';
+
+  function showToast(msg, type) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'refresh-toast show ' + type;
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.className = 'refresh-toast', 3500);
+  }
+
+  async function triggerRefresh() {
+    const btn = document.getElementById('refreshBtn');
+    btn.classList.add('loading');
+    btn.disabled = true;
+    showToast('Refreshing data…', '');
+
+    try {
+      const res = await fetch(LOCAL_SERVER + '/api/refresh', {
+        method: 'POST',
+        signal: AbortSignal.timeout(310000)
+      });
+      const data = await res.json();
+      if (data.ok) {
+        const pub = data.pages_url ? ' · Published → ' + data.pages_url : '';
+        showToast('✓ Data refreshed — reloading…' + pub, 'ok');
+        setTimeout(() => window.location.reload(), 1200);
+      } else {
+        showToast('⚠ ' + data.message, 'err');
+        btn.classList.remove('loading');
+        btn.disabled = false;
+      }
+    } catch (e) {
+      // Local server not running — give instructions
+      showToast('Run: python src/server.py — then click Refresh', 'err');
+      btn.classList.remove('loading');
+      btn.disabled = false;
+    }
+  }
+</script>
+</body>
+</html>
